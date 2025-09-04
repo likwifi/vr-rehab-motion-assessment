@@ -1,0 +1,18 @@
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.user
+*.suo
+*.tmp
+*.log
+
+# Unity asset metadata
+# Not tracked in this code-only extract: the .meta files stay on disk so the
+# local Unity project keeps its GUIDs, but they add no value to a code review.
+*.meta
+
+# Unity generated folders (in case this is dropped into a full project)
+Library/
+Temp/
+Logs/
+UserSettings/
