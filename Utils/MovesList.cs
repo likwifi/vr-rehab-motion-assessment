@@ -15,5 +15,12 @@ namespace utils
         {
             moves.Add(moveObj);
         }
+
+        public IEnumerator GetEnumerator()
+        {
+            return moves.GetEnumerator();
+        }
+
+        public T this[int i] => moves.ElementAt(i);
     }
 }
