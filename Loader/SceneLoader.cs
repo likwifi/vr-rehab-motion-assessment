@@ -10,4 +10,15 @@ public class SceneLoader : MonoBehaviour
     {
 
     }
+
+    public void ResetScene(string sceneName)
+    {
+        SceneManager.LoadScene("Loader");
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 }
