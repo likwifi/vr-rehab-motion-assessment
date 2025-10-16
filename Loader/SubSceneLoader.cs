@@ -24,5 +24,31 @@ public class SubSceneLoader : MonoBehaviour
                 SceneManager.SetActiveScene(nextScene);
                 //nextSceneName = null;
             }
+        
+    }
+
+    public void LoadScene(string subScenePath)
+    {
+        //SceneManager.LoadScene("Loader");
+        //FlutterUnityPlugin.Message message = FlutterUnityPlugin.Messages.Receive(data);
+        //string subScenePath = message.data;
+        //GameObject loadedScene = new GameObject("Loaded");
+        //GameObject Controller1 = GameObject.Find("Controller1");
+        //ScriptB controller = (ScriptB)go.GetComponent(typeof(ScriptB));
+        //controller.load
+        //api.GetBundleObject(subScenePath, OnContentLoaded, loadedScene.transform);
+    }
+
+    void OnContentLoaded(GameObject content)
+    {
+        //do something cool here
+        Debug.Log("Loaded: " + content.name);
+    }
+
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }
