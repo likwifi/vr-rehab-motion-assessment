@@ -126,5 +126,58 @@ public class CharacterControllerBase : MonoBehaviour
         {
             Debug.Log($"Request Successful. Response: {ttsRequest.downloadHandler.text}");
         }
+        
+        
+        var nameHash = Animator.StringToHash(speaker + text).ToString();
+        var path = Path.Combine(Application.persistentDataPath, nameHash + ".mp3");
+        File.WriteAllBytes(path, ttsRequest.downloadHandler.data);
+        ttsRequest.Dispose();
+        Debug.Log("Loaded");
+        StartCoroutine(LoadAudioFile("file://" + path, (text) =>
+        {
+            Debug.Log("Playing");
+            ToggleBgMusic(true);
+            callbackOnPlay?.Invoke("finished");
+        }, (text) =>
+        {
+            ToggleBgMusic(false);
+            callbackOnFinishPlay?.Invoke("finished");
+        }));
+    }
+
+    protected void ToggleBgMusic(bool lower)
+    {
+        if (_bgMusicAudioSource != null)
+            _bgMusicAudioSource.volume = lower ? 0.2f : _bgMusicVolume;
+    }
+
+
+    protected void UpdateCounter()
+    {
+        // TODO interactive character controller case
+        // timer.tim
+        // if (progressBar == null)
+        //     return;
+        // countNumber += 1;
+        // counter.text = countNumber.ToString();
+        // progressBar.fillValue = (100 / totalCounts) * countNumber;
+    }
+
+    protected void StartCounter(float tickDuration, float totalDuration)
+    {
+        if (timer == null || totalDuration == 0)
+            return;
+        ResetCounter();
+        timer.duration = totalDuration;
+        timer.tickTime = timerType == "Countdown" ? 1 : tickDuration;
+        timer.StartTimer();
+    }
+
+    protected void ResetCounter()
+    {
+        timer.StopAllCoroutines();
+        timer.duration = 0;
+        timer.tickTime = 0;
+        timer.StopTimer();
     }
 }
