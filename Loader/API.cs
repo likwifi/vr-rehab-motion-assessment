@@ -55,5 +55,17 @@ public class API : MonoBehaviour
         {
             Debug.Log(www.error);
         }
+        else
+        {
+            AudioClip myClip = DownloadHandlerAudioClip.GetContent(www);
+            audioSource.clip = myClip;
+            audioSource.Play();
+            Debug.Log("Audio is playing.");
+            callbackOnPlay?.Invoke("success");
+            var length = myClip.length;
+            yield return new WaitForSeconds(length/myClip.channels);
+            callbackOnFinish?.Invoke("success");
+        }
     }
+
 }
