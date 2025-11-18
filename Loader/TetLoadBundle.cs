@@ -14,5 +14,19 @@ public class TetLoadBundle : MonoBehaviour
             Debug.Log("Failed to load AssetBundle!");
             return;
         }
+
+        var rootAssetPath = bundle.GetAllAssetNames()[0];
+        var arObject = Instantiate(bundle.LoadAsset(rootAssetPath) as GameObject);
+        bundle.Unload(false);
+        /*var prefab = myLoadedAssetBundle.LoadAsset<GameObject>("Bundle");
+        Instantiate(prefab);
+
+        myLoadedAssetBundle.Unload(false);*/
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
     }
 }
