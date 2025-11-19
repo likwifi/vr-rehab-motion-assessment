@@ -180,4 +180,35 @@ public class CharacterControllerBase : MonoBehaviour
         timer.tickTime = 0;
         timer.StopTimer();
     }
+
+    // private bool isCoroutineExecuting;
+
+    protected IEnumerator ExecuteAfterTime(float time, Action task)
+    {
+        // if (isCoroutineExecuting)
+        // yield break;
+        // isCoroutineExecuting = true;
+        yield return new WaitForSeconds(time);
+        task();
+        // isCoroutineExecuting = false;
+    }
+
+
+    public virtual void StartResumeWorkout()
+    {
+        throw new NotImplementedException();
+    }
+
+    public static bool MovementsPaused { get; set; }
+
+    protected virtual void Pause()
+    {
+        throw new NotImplementedException();
+    }
+
+    public IEnumerator speak(string text, Action<object> callbackOnPlay = null,
+        Action<object> callbackOnFinishPlay = null, bool store = true)
+    {
+        yield return GetAudioClipService(text, callbackOnPlay, callbackOnFinishPlay, _speaker, _speakerStyle, store);
+    }
 }
