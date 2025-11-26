@@ -19,5 +19,18 @@ public static class SpeechUtils
         {
             Debug.Log(www.error);
         }
+        else
+        {
+            var myClip = DownloadHandlerAudioClip.GetContent(www);
+            characterAudioSource.clip = myClip;
+            characterAudioSource.Play();
+            Debug.Log("Audio is playing.");
+            callbackOnPlay?.Invoke(myClip);
+        }
+
+        www.Dispose();
+        yield return new WaitWhile(() => characterAudioSource.isPlaying);
+        callbackOnFinishPlay?.Invoke("finished");
+        yield return new WaitForSeconds(waitTime);
     }
 }
