@@ -211,4 +211,113 @@ public class CharacterControllerBase : MonoBehaviour
     {
         yield return GetAudioClipService(text, callbackOnPlay, callbackOnFinishPlay, _speaker, _speakerStyle, store);
     }
+
+    public void SetState(string state)
+    {
+        m_Animator.CrossFade(state, 0.5f);
+    }
+
+    public void setPoseEsimtator(PoseEstimation ps)
+    {
+        poseEstimation = ps;
+    }
+
+    public void BodyFullyVisible()
+    {
+        var userName = WorkoutStarter.userName;
+        var message = string.Format(LocaleBundle.get()["can_see"], userName);
+
+        StartCoroutine(speak(message, null, (object text) =>
+        {
+            FlutterMessage.SendMessage("hideSkipBtn", "ui");
+            StartResumeWorkout();
+        }));
+        // instance.StartCoroutine(SpeechUtils.GetAudioClip(message,
+        //     0f,
+        //     _characterAudioSource, null, (object text) => { Resume(); }));
+        // Destroy(_siriObj);
+        // ToggleBgMusic(false);
+        // VoiceController.StopListening();
+    }
+
+    public void BodyNotFullyVisible(Action continueWorkoutCallback)
+    {
+        var userName = WorkoutStarter.userName;
+        var message = string.Format(LocaleBundle.get()["cant_see"], userName);
+        Pause();
+        StartCoroutine(speak(message, null, (object text) =>
+        {
+            FlutterMessage.SendMessage("showSkipBtn", "ui");
+            // ListenForCallback(continueWorkoutCallback);
+        }));
+    }
+
+    /*
+    private void ListenForCallback(Action continueWorkoutCallback)
+    {
+        void Resume()
+        {    StartCoroutine(speak(LocaleBundle.get()["resuming"], null, (object text) =>
+            {
+                StartResumeWorkout();
+                continueWorkoutCallback();
+            }));
+            ToggleBgMusic(false);
+            Destroy(_siriObj);
+            VoiceController.StopListening();
+        }
+        void CallBack(string result)
+        {
+            var resultStr = (string)result;
+            Debug.Log("Voice result is " + resultStr);
+            var positiveWord = "continue";
+            if (WorkoutStarter.localeCode == "zh")
+            {
+                positiveWord = "继续";
+            }
+
+            if (resultStr.IndexOf(positiveWord, StringComparison.OrdinalIgnoreCase) <= -1)
+                return;
+            Resume();
+        }
+        Debug.Log("Started Listening");
+        var siri =  (GameObject) Resources.Load("SiriObj", typeof(GameObject));
+        // render at place where no geometry exists.
+        var loc = new Vector3(-1111.0270000007f, 1111.1170001f, -1111.17600012f);
+        _siriObj = Instantiate(siri, loc, transform.rotation);
+        ToggleBgMusic(true);
+        VoiceController.StartListening(CallBack);
+        // StartCoroutine( ExecuteAfterTime(5f, Resume));
+       
+#if UNITY_EDITOR
+        // instance.StartCoroutine(SpeechUtils.GetAudioClip("Resuming workout.",
+        //     0f,
+        //     _characterAudioSource, null, (object text) =>
+        //     {
+        //         Resume();
+        //         continueWorkoutCallback();
+        //     }));
+#endif
+    }*/
+
+    public void StartListening(Action<string> CallBack)
+    {
+        var siri = (GameObject)Resources.Load("SiriObj", typeof(GameObject));
+        // render at place where no geometry exists.
+        var loc = new Vector3(-1111.0270000007f, 1111.1170001f, -1111.17600012f);
+        _siriObj = Instantiate(siri, loc, transform.rotation);
+        var cameraData = mainCamera.GetComponent<UniversalAdditionalCameraData>();
+        cameraData.cameraStack.Add(GameObject.Find("Canvas Camera").GetComponent<Camera>());
+        ToggleBgMusic(true);
+// SPEECH
+        // VoiceController.StartListening(CallBack);
+    }
+
+    public void StopListening()
+    {
+        Debug.Log("Stopped listening");
+        ToggleBgMusic(false);
+        Destroy(_siriObj);
+        // SPEECH
+        // VoiceController.StopListening();
+    }
 }
