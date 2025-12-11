@@ -52,4 +52,55 @@ public class WorkoutStarter : MonoBehaviour
         SceneManager.LoadScene(0);
         Caching.ClearCache();
     }
+
+    public void LoadScene(string objectName)
+    {
+        // var m1 = new Message { id = 0, data = "Message received at unity side." };
+        // Messages.Send(m1);
+
+        // Message message = Messages.Receive(data);
+        //
+        // DestroyAllChildren();
+        // var objectName = message.data;
+        //
+        GameObject loadedScene = new GameObject("LoadedScene");
+
+        api.GetBundleObject(objectName, OnContentLoaded, loadedScene.transform);
+
+        // message.data = "Loading Scene at object LoadedScene " + name;
+        //
+        // Messages.Send(message);
+    }
+
+    public void PlayPlaylist(string flutterMessage)
+    {
+        // var objectName = "rel1.mp3,rel2.mp3";
+        // var type = "yoga";
+        var m = JObject.Parse(flutterMessage);
+        var objectName = (string)m.GetValue("music");
+        var type = (string)m.GetValue("type");
+        StartCoroutine(PlayPlaylist(objectName, type));
+    }
+
+    private IEnumerator PlayPlaylist(string objectName, string type)
+    {
+        string[] playlist = objectName.Split(",");
+        foreach (var music in playlist)
+        {
+            yield return StartCoroutine(PlayMusic(music, type));
+        }
+    }
+
+    private IEnumerator PlayMusic(string music, string type)
+    {
+        bool playbackFinished = false;
+        var _cameraAudioSource = GetComponent<AudioSource>();
+
+        // Start the coroutine to load and play the audio file
+        StartCoroutine(api.LoadStreamingAudioFile(music, type, _cameraAudioSource, null,
+            (obj) => { playbackFinished = true; }));
+
+        // Wait until the audio file has finished playing
+        yield return new WaitUntil(() => playbackFinished);
+    }
 }
