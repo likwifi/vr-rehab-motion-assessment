@@ -15,5 +15,11 @@ namespace Mediapipe.Unity.Tutorial
             _c[2] = z;
 
         }
+        // public float[] _c { get; set; }
+        
+        public Vector3 ToVec()
+        {
+            return new Vector3(_c[0], _c[1], _c[2]);
+        }
     }
 }
