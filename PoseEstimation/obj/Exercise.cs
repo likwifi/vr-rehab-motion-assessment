@@ -45,3 +45,16 @@ namespace Mediapipe.Unity.Tutorial
         }
     }
 }
+
+public class Coord3
+{
+    public float x, y, z, p;
+
+    public Coord3(float landmarkX, float landmarkY, float landmarkZ, float presence)
+    {
+        x = landmarkX;
+        y = landmarkY;
+        z = landmarkZ;
+        p = presence;
+    }
+}
