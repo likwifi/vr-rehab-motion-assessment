@@ -62,5 +62,141 @@ namespace Mediapipe.Unity.Tutorial
 
             // Invoke(nameof(UpdateAvatar), 28.0f);
         }
+
+        private IEnumerator Start()
+        {
+            yield return _resourceManager.PrepareAssetAsync("pose_detection.bytes");
+            yield return _resourceManager.PrepareAssetAsync("pose_landmark_lite.bytes");
+            if (WebCamTexture.devices.Length == 0)
+            {
+                throw new Exception("Web Camera devices are not found");
+            }
+
+            var inferenceMode = InferenceMode.GPU;
+
+#if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
+            Logger.LogWarning("Current platform does not support GPU inference mode, so falling back to CPU mode");
+            Debug.Log("Using CPU");
+            inferenceMode = InferenceMode.CPU;
+#else
+        Debug.Log("Using GPU");
+        FlutterMessage.SendMessage("Using GPU", "metadata");
+        if (!GpuManager.IsInitialized)
+            yield return GpuManager.Initialize();
+#endif
+            var webCamDevice = WebCamTexture.devices[inferenceMode.Equals(InferenceMode.GPU) ? 1 : 0];
+            // BLOCKER
+            _fps = 12;
+            _webCamTexture = new WebCamTexture(webCamDevice.name, _width, _height, _fps);
+            _webCamTexture.Play();
+
+            yield return new WaitUntil(() => _webCamTexture.width > 16);
+            yield return new WaitUntil(() => CharacterControllerBase.isInitialized);
+            getCharacter();
+            character.setPoseEsimtator(this);
+            var stopwatch = new Stopwatch();
+
+            try
+            {
+                _screen.rectTransform.sizeDelta = new Vector2(_width, _height);
+
+                _inputTexture = new Texture2D(_width, _height, TextureFormat.RGBA32, false);
+                _inputPixelData = new Color32[_width * _height];
+
+#if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
+                _outputTexture = new Texture2D(320, 240, TextureFormat.RGBA32, false);
+                _outputPixelData = new Color32[320 * 240];
+                /*_outputTexture = new Texture2D(_width, _height, TextureFormat.RGBA32, false);
+                _outputPixelData = new Color32[_width * _height];*/
+#else
+            /*_outputTexture = new Texture2D(320, 240, TextureFormat.RGBA32, false);
+            _outputPixelData = new Color32[320 * 240];*/
+            _outputTexture = new Texture2D(_width, _height, TextureFormat.RGBA32, false);
+            _outputPixelData = new Color32[_width * _height];
+#endif
+                FlutterMessage.SendMessage(_width + "," + _height, "metadata");
+
+                _screen.texture = _outputTexture;
+
+                if (inferenceMode.Equals(InferenceMode.GPU))
+                {
+                    _graph = new CalculatorGraph(_configAssetGPU.text);
+                    _graph.SetGpuResources(GpuManager.GpuResources).AssertOk();
+                }
+                else
+                {
+                    _graph = new CalculatorGraph(_configAssetCPU.text);
+                }
+            }
+            catch (Exception e)
+            {
+                FlutterMessage.SendMessage(e.ToString(), "metadata");
+                Debug.Log(e.ToString());
+            }
+
+            var outputVideoStream = new OutputStream<ImageFramePacket, ImageFrame>(_graph, "output_video");
+            var poseLandmarksStream =
+                new OutputStream<NormalizedLandmarkListPacket, NormalizedLandmarkList>(_graph, "pose_landmarks");
+
+            outputVideoStream.StartPolling().AssertOk();
+            poseLandmarksStream.StartPolling().AssertOk();
+
+            var sidePacket = new SidePacket();
+            sidePacket.Emplace("model_complexity", new IntPacket((int)ModelComplexity.Lite));
+            _graph.StartRun(sidePacket).AssertOk();
+            stopwatch.Start();
+
+            // var screenRect = _screen.GetComponent<RectTransform>().rect;
+
+
+#if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
+            // StartCoroutine(ExerciseTester());
+#endif
+            while (true)
+            {
+                try
+                {
+                    _inputTexture.SetPixels32(_webCamTexture.GetPixels32(_inputPixelData));
+                    var imageFrame = new ImageFrame(ImageFormat.Types.Format.Srgba, _width, _height, _width * 4,
+                        _inputTexture.GetRawTextureData<byte>());
+                    var currentTimestamp = stopwatch.ElapsedTicks / (TimeSpan.TicksPerMillisecond / 1000);
+
+                    _graph.AddPacketToInputStream("input_video",
+                            new ImageFramePacket(imageFrame, new Timestamp(currentTimestamp)))
+                        .AssertOk();
+                    if (outputVideoStream.TryGetNext(out var outputVideo))
+                    {
+                        // FlutterMessage.SendMessage(outputVideo.Width() + "_out_" + outputVideo.Height(), "metadata");
+                        // FlutterMessage.SendMessage(_outputPixelData.Length + "_out_length", "metadata");
+
+                        if (outputVideo.TryReadPixelData(_outputPixelData))
+                        {
+                            _outputTexture.SetPixels32(_outputPixelData);
+                            _outputTexture.Apply();
+                            // FlutterMessage.SendMessage("SettedPixels", "metadata");
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    FlutterMessage.SendMessage(e.ToString(), "metadata");
+                    Debug.Log(e.ToString());
+                }
+
+                CountReps(poseLandmarksStream);
+
+                /*try
+                {
+                    CountReps(poseLandmarksStream);
+                }
+                catch (Exception e)
+                {
+                    FlutterMessage.SendMessage(e.ToString(), "metadata");
+                    Debug.Log(e.ToString());
+                }*/
+
+                yield return new WaitForSeconds((1f / _fps));
+            }
+        }
     }
 }
