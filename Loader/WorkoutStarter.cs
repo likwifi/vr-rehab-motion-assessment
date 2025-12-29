@@ -103,4 +103,81 @@ public class WorkoutStarter : MonoBehaviour
         // Wait until the audio file has finished playing
         yield return new WaitUntil(() => playbackFinished);
     }
+
+
+    /*private IEnumerator PlayPlaylist(string objectName, string type)
+    {
+        var _cameraAudioSource = GetComponent<AudioSource>();
+        string[] playlist = objectName.Split(",");
+        var playbackFinished = true;
+        foreach (var music in playlist)
+        {
+            yield return new WaitUntil(() => playbackFinished);
+            playbackFinished = false;
+            StartCoroutine(api.LoadStreamingAudioFile(music, type, _cameraAudioSource, null,
+                (obj) => {
+                playbackFinished = true; }));
+
+            yield return new WaitForSeconds(5);
+            StopAllCoroutines();
+        }
+    }*/
+
+    public void setUserName(string userName_)
+    {
+        userName = userName_;
+    }
+    public void setGender(string gender_)
+    {
+        gender = gender_;
+    }
+    public void setLocaleCode(string localeCode_)
+    {
+        // localeCode = localeCode_;
+
+        //
+        // message.data = "Loading Scene at object LoadedScene " + name;
+        //
+        // Messages.Send(message);
+    }
+
+
+    void OnContentLoaded(GameObject content, string url)
+    {
+        /*else
+        {
+            character = GameObject.Find("Character").GetComponent<CharacterControllerBase>();
+            character.StartResumeWorkout();
+        }*/
+
+        //do something cool here
+        var message = "LOADED: " + content.name;
+
+        Debug.Log("Unity: " + message);
+        FlutterMessage.SendMessage(message);
+        if (poseEstimator != null)
+        {
+#if UNITY_EDITOR_OSX || UNITY_EDITOR_WIN
+            var poseEstimatorObj = Instantiate(poseEstimator, transform.position, transform.rotation);
+            poseEstimatorObj.transform.parent = GameObject.Find("LoadedScene").transform;
+            var character = GameObject.Find("Character").GetComponent<InteractiveCharacterController>();
+
+            character.setWorkoutJson("https://firebasestorage.googleapis.com/v0/b/optical-net-91011.appspot.com/o/jsons%2Fhiit%2FJamie%2FnegOuRLOfQ.json?alt=media&token=a5672739-209d-459d-b04a-095114f687d5");
+#else
+            StartCoroutine(WaitForWorkout());
+#endif
+        }
+    }
+
+    IEnumerator WaitForWorkout()
+    {
+        float startTime = Time.time;
+        var character = GameObject.Find("Character").GetComponent<InteractiveCharacterController>();
+        float maxWaitTime = 3.0f;
+        while (!(character.WorkoutType.Equals("hiit") || character.WorkoutType.Equals("kids")) &&
+               Time.time - startTime < maxWaitTime)
+        {
+            yield return null; // Wait for the next frame
+        }
+    }
 }
