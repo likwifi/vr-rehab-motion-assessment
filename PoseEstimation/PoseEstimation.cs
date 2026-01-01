@@ -198,5 +198,102 @@ namespace Mediapipe.Unity.Tutorial
                 yield return new WaitForSeconds((1f / _fps));
             }
         }
+
+        String previousState = "";
+        RepState previousExercise = null;
+        readonly RepetitionDetector detector = new();
+
+        private void CountReps(OutputStream<NormalizedLandmarkListPacket, NormalizedLandmarkList> poseLandmarksStream)
+        {
+            var visibleLandmarks = new List<int>();
+
+            // reps count
+            var currentState = character.currentAnimatorState;
+
+            if (previousState != currentState)
+            {
+                repExercise = repStates.Find(r => r.stateName == currentState);
+                previousState = currentState;
+                detector.CleanUp();
+                FlutterMessage.SendMessage(0.ToString(), "repsCount");
+
+                Debug.Log("Cleanup");
+            }
+
+            if (!Equals(repExercise, previousExercise))
+            {
+                previousExercise = repExercise;
+                if (repExercise != null)
+                {
+                    LowerValuesByPercentage(repExercise.thresholds, 0.1f);
+                    Debug.Log("Lowered");
+                }
+            }
+
+            if (!poseLandmarksStream.TryGetNext(out var poseLandmarks)) return;
+            if (poseLandmarks == null) return;
+            var i = 0;
+            foreach (var landmark in poseLandmarks.Landmark)
+            {
+                if (landmark.Presence > 0.8)
+                {
+                    visibleLandmarks.Add(i);
+                }
+
+                i++;
+            }
+
+            if (visibleLandmarks.Count < 26) // 33 all
+            {
+                if (!_partialBodyNotificationSend)
+                {
+                    _partialBodyNotificationSend = true;
+                    BodyNotFullyVisible();
+                }
+            }
+            else if (!_bodyFullyVisibleNotificationSend)
+            {
+                _bodyFullyVisibleNotificationSend = true;
+                StartCoroutine(BodyFullyVisible());
+            }
+
+            if (repExercise == null) return;
+
+            detector.SetThresholds(repExercise.thresholds);
+            if (repExercise.axis != null)
+            {
+                detector.SetMovementAxis(repExercise.axis);
+            }
+
+            var oldReps = detector.GetRepetitionCount();
+            var repJoints = repExercise.joints;
+            var joint1 = poseLandmarks.Landmark[repJoints[0]];
+            var joint2 = repJoints.Count > 1 ? poseLandmarks.Landmark[repJoints[1]] : null;
+            AvatarController.Instance.UpdateDummy(repExercise);
+
+            if (joint1.Presence > 0.8)
+            {
+                detector.Update(joint1, joint2 != null && joint2.Presence > 0.8 ? joint2 : null);
+                var newReps = detector.GetRepetitionCount();
+                if (newReps != oldReps)
+                {
+                    FlutterMessage.SendMessage(newReps.ToString(), "repsCount");
+                    AvatarController.Instance.UpdateAvatar(repExercise);
+
+                    Debug.Log(newReps.ToString());
+                }
+            }
+            // Debug.Log(curresentState + " count: " + detector.GetRepetitionCount());
+        }
+
+
+
+        private void LowerValuesByPercentage(List<float> floatList, float percentage)
+        {
+            for (int i = 0; i < floatList.Count; i++)
+            {
+                floatList[i] -= floatList[i] * percentage;
+            }
+        }
     }
 }
