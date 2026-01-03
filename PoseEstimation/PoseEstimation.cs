@@ -295,5 +295,31 @@ namespace Mediapipe.Unity.Tutorial
                 floatList[i] -= floatList[i] * percentage;
             }
         }
+
+        private int exerciseTesterIndex = 52;
+        // private int exerciseTesterIndex = 28;
+
+        private IEnumerator ExerciseTester()
+        {
+            repExercise = repStates[exerciseTesterIndex];
+            character.SetState(repExercise.stateName);
+            // repExercise = repStates.Find(r => r.stateName == repExercise.stateName);
+
+            // Debug.Log(repExercise.StateName);
+            yield return new WaitForSeconds(150);
+            exerciseTesterIndex++;
+            StartCoroutine(ExerciseTester());
+        }
+
+        private IEnumerator fakeTip()
+        {
+            // TODO temp solution for demo purposes.
+            yield return new WaitForSeconds(22f);
+            yield return character.speak(
+                "Lower your body until your thighs are parallel to the ground.");
+            yield return new WaitForSeconds(10f);
+            yield return character.speak(
+                "Excellent work!");
+        }
     }
 }
