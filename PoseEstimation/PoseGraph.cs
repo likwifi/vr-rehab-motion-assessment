@@ -96,5 +96,45 @@ namespace Mediapipe.Unity.Tutorial
             links[31] = new[] { 27, 29 };
             links[32] = new[] { 28, 30 };
         }
+
+        public int[][] calculateAngels(RepeatedField<NormalizedLandmark> poseLandmarksLandmark)
+        {
+            var angles = new int[links.Length][];
+            for (var i = 0; i < links.Length; i++)
+            {
+                var start = poseLandmarksLandmark[i];
+                var size = links[i].Length;
+                angles[i] = new int[size];
+                for (int j = 0; j < links[i].Length; j++)
+                {
+                    var end = poseLandmarksLandmark[j];
+                    // Vector3 targetDir = end.position - transform.position;
+                    // float angle = Vector3.Angle(targetDir, transform.forward);
+
+                    if (end.Presence<0.7)
+                        continue;
+                    var angle = calculateAngel(start, end);
+                    angles[i][j] = angle;
+                }
+            }
+
+            return angles;
+        }
+
+        private int calculateAngel(NormalizedLandmark start, NormalizedLandmark end)
+        {
+            var vec1 = new Vector3(start.X, start.Y, start.Z);
+            var vec2 = new Vector3(end.X, end.Y, end.Z);
+            
+            //Get the dot product
+            var dot = Vector3.Dot(vec1, vec2);
+            // Divide the dot by the product of the magnitudes of the vectors
+            dot = dot / (vec1.magnitude * vec2.magnitude);
+            //Get the arc cosin of the angle, you now have your angle in radians 
+            var acos = Mathf.Acos(dot);
+            //Multiply by 180/Mathf.PI to convert to degrees
+            var angle = (int)Math.Round(acos * 180 / Mathf.PI);
+            return angle;
+        }
     }
 }
