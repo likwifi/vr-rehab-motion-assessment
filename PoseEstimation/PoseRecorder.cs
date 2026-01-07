@@ -156,5 +156,49 @@ namespace Mediapipe.Unity.Tutorial
                 }
             }
         }
+
+        public bool recordPressed = false;
+        public string exerciseName;
+
+        public void StartStopRecording()
+        {
+            if (recordPressed)
+            {
+                movieRecorder.StartRecording(exerciseName);
+            }
+            else
+            {
+                movieRecorder.StopRecording();
+                StopRecording();
+            }
+        }
+
+
+        private static Exercise _RecordingExercise;
+
+        public static void Record(RepeatedField<NormalizedLandmark> poseLandmarks, int[][] angles, string name, int fps)
+        {
+            if (_RecordingExercise == null)
+            {
+                _RecordingExercise = new Exercise
+                {
+                    name = name,
+                    fps = fps
+                };
+            }
+
+            var coordinatesArray = new PoseVector3[poseLandmarks.Count];
+            var i = 0;
+            foreach (var landmark in poseLandmarks)
+            {
+                // TODO landmark.Presence
+                var position = new PoseVector3(landmark.X, landmark.Y, landmark.Z);
+                coordinatesArray[i] = position;
+                i++;
+            }
+
+            _RecordingExercise.moves.Add(coordinatesArray);
+            _RecordingExercise.angles.Add(angles);
+        }
     }
 }
