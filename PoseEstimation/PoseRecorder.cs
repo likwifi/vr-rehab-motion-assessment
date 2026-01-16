@@ -200,5 +200,38 @@ namespace Mediapipe.Unity.Tutorial
             _RecordingExercise.moves.Add(coordinatesArray);
             _RecordingExercise.angles.Add(angles);
         }
+
+        void StopRecording()
+        {
+            /*BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(Application.dataPath + "/save.dat", FileMode.OpenOrCreate);
+            bf.Serialize(file, _RecordingExercise);
+            file.Close();
+            
+            return;*/
+            var json = JsonConvert.SerializeObject(_RecordingExercise);
+
+
+            Debug.Log("Stopped");
+            if (_RecordingExercise != null)
+            {
+                Debug.Log("File written");
+                File.WriteAllText(Path.Combine(Application.dataPath , "PoseRecordings",_RecordingExercise.name, _RecordingExercise.name) + ".json", json);
+            }
+
+
+            _RecordingExercise = null;
+        }
+
+        private void LoadJSON()
+        {
+            string name = "Squat";
+            string filePath = Application.dataPath + "/" + name + ".json";
+            if (File.Exists(filePath))
+            {
+                var json = File.ReadAllText(filePath);
+                _RecordingExercise = JsonConvert.DeserializeObject<Exercise>(json);
+            }
+        }
     }
 }
