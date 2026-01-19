@@ -22,4 +22,37 @@ public class RecordButtonHandler : MonoBehaviour
     {
         Debug.Log("You have clicked the button!");
     }
+
+    void Update()
+    {
+        //Check for mouse click 
+        /*if (Input.GetMouseButtonDown(0))
+        {
+            RaycastHit raycastHit;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out raycastHit, 100f))
+            {
+                if (raycastHit.transform != null)
+                {
+                   //Our custom method. raycastHit.transform.gameObject
+                   StartStopRecording();
+                }
+            }
+        }*/
+    }
+
+    private void Awake()
+    {
+        _textCmp = textGameObject.GetComponent<TextMeshProUGUI>();
+        GetComponent<Image>().color = UnityEngine.Color.white;
+    }
+
+    public void StartStopRecording()
+    {
+        recorder.recordPressed = !recorder.recordPressed;
+        recorder.StartStopRecording();
+        _textCmp.text = recorder.recordPressed ? "Stop Recording." : "Start Recording.";
+        GetComponent<Image>().color = recorder.recordPressed ? UnityEngine.Color.red : UnityEngine.Color.white;
+    }
 }
+#endif
