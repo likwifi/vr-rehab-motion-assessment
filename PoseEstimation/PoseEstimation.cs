@@ -321,5 +321,19 @@ namespace Mediapipe.Unity.Tutorial
             yield return character.speak(
                 "Excellent work!");
         }
+
+        private void getCharacter()
+        {
+            character = GameObject.Find("Character").GetComponent<CharacterControllerBase>();
+        }
+
+
+        private IEnumerator BodyFullyVisible()
+        {
+            yield return new WaitForSeconds(3f);
+
+            character.BodyFullyVisible();
+            // KidsCharacterController.BodyFullyVisible();
+        }
     }
 }
