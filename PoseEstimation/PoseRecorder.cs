@@ -233,5 +233,22 @@ namespace Mediapipe.Unity.Tutorial
                 _RecordingExercise = JsonConvert.DeserializeObject<Exercise>(json);
             }
         }
+
+        private IEnumerator BodyFullyVisible()
+        {
+            yield return new WaitForSeconds(3f);
+        }
+
+        private void BodyNotFullyVisible()
+        {
+            // GameObject character = GameObject.Find("Character");
+            // AudioSource characterAudioSource = character.GetComponent<AudioSource>();
+            //
+            // yield return new WaitForSeconds(3f);
+            void ContinueWorkout()
+            {
+                Hide();
+            }
+        }
     }
 }
