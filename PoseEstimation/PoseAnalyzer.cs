@@ -23,5 +23,34 @@ namespace Mediapipe.Unity.Tutorial
         {
             _currentExercise = JsonConvert.DeserializeObject<Exercise>(json);
         }
+
+        public void StartPoseAnalysis(RepeatedField<NormalizedLandmark> poseLandmarks, long time)
+        {
+            // foreach (var t in _exercises)
+            // {
+            //     if (t.start < time && t.end > time)
+            //     {
+            //         _currentExercise = t;
+            //         break;
+            //     }
+            // }
+
+            AddMove(poseLandmarks);
+            float[] similarity = _currentExercise.CalculatePoseSimilarity(_moves);
+            similarityList.Add(similarity); // TODO 
+            var text = GameObject.Find("Correlation").GetComponent<TextMeshProUGUI>();
+            var totalSimilarity = similarity.Aggregate(0.0, (current, t) => current + t);
+
+            text.text = totalSimilarity.ToString(CultureInfo.InvariantCulture);
+            UnityMessageManager.Instance.SendMessageToFlutter(
+                JsonUtility.ToJson(new SimilarityObjectMessage
+                { similarity = similarity, type = "poseSimilarity" }));
+        }
+
+        class SimilarityObjectMessage
+        {
+            public float[] similarity;
+            public string type;
+        }
     }
 }
