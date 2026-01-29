@@ -179,5 +179,32 @@ public class WorkoutStarter : MonoBehaviour
         {
             yield return null; // Wait for the next frame
         }
+
+        if ((character.WorkoutType.Equals("hiit") || character.WorkoutType.Equals("kids")))
+        {
+            var poseEstimatorObj = Instantiate(poseEstimator, transform.position, transform.rotation);
+            poseEstimatorObj.transform.parent = GameObject.Find("LoadedScene").transform;
+        }
+        else
+        {
+            Debug.Log("Timeout reached without matching the string value.");
+        }
+    }
+
+    void DestroyAllChildren()
+    {
+        GameObject loadedScene = GameObject.Find("LoadedScene");
+        if (loadedScene != null)
+        {
+            Destroy(loadedScene);
+        }
+
+        StopAllCoroutines();
+        Debug.Log("Destroyed Loaded Scene");
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
     }
 }
