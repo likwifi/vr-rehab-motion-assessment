@@ -52,5 +52,23 @@ namespace Mediapipe.Unity.Tutorial
             public float[] similarity;
             public string type;
         }
+
+        private void AddMove(RepeatedField<NormalizedLandmark> poseLandmarks)
+        {
+            var coordinatesArray = new Vector3[poseLandmarks.Count];
+            var i = 0;
+            foreach (var landmark in poseLandmarks)
+            {
+                // , landmark.Presence
+                var position = new Vector3(landmark.X, landmark.Y, landmark.Z);
+                coordinatesArray[i] = position;
+                i++;
+            }
+
+            _moves.Add(coordinatesArray);
+        }
+
+
+     
     }
 }
