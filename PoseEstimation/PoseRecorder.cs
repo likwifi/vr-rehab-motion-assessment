@@ -250,5 +250,36 @@ namespace Mediapipe.Unity.Tutorial
                 Hide();
             }
         }
+
+        public static void Hide()
+        {
+            // GameObject.Find("Camera Canvas").SetActive(false);
+        }
+
+
+        private void OnDestroy()
+        {
+            if (_webCamTexture != null)
+            {
+                _webCamTexture.Stop();
+            }
+
+            if (_graph != null)
+            {
+                try
+                {
+                    _graph.CloseInputStream("input_video").AssertOk();
+                    _graph.WaitUntilDone().AssertOk();
+                }
+                finally
+                {
+                    _graph.Dispose();
+                }
+            }
+#if !UNITY_EDITOR_OSX && !UNITY_EDITOR_WIN
+    GpuManager.Shutdown();
+#endif
+        }
     }
 }
+#endif
