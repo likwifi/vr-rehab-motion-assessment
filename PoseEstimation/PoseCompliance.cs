@@ -59,5 +59,53 @@ namespace Mediapipe.Unity.Tutorial
 
             
         }
+
+        private void poseComplied()
+        {
+            startFeature = 0;
+            var time = bagOfKeyframes[^1].complianceTime - bagOfKeyframes[0].complianceTime;
+            poseCompliedFeedback?.Invoke(time);
+        }
+
+        public void setOnCompliedFeedback(Action<int> action)
+        {
+            poseCompliedFeedback = action;
+        }
+    }
+    [Serializable]
+    public class Keyframe
+    {
+        public int[][] featureAngles;
+        public  int[][] thresholds;
+        public string message;
+        public bool messageSend = false;
+
+        public int complianceTime = 0;
+
+        public Keyframe(int[][]featureAngles,int[][]thresholds, string message = "")
+        {
+            this.message = message;
+            this.featureAngles = featureAngles;
+            this.thresholds = thresholds;
+        }
+
+        public bool comply(int[][] anglesToComply)
+        {
+            for (var i = 0; i < featureAngles.Length; i++)
+            {
+                var angles = featureAngles[i];
+                if (angles == null) continue;
+                for (var j = 0; j < angles.Length; j++)
+                {
+                    var complyValue = (angles[j] - anglesToComply[i][j]) < thresholds[i][j];
+                    if (!complyValue)
+                        return false;
+                    // complyValues.Add(complyValue);
+                }
+            }
+
+            complianceTime = DateTime.Now.Millisecond;
+            return true;
+        }
     }
 }
