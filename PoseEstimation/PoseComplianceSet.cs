@@ -10,5 +10,14 @@ namespace Mediapipe.Unity.Tutorial
         {
             this.poseComplianceSet = poseComplianceSet;
         }
+
+        public void complies(int[][] angels)
+        {
+            foreach (var compliance in poseComplianceSet)
+            {
+                compliance.complies(angels);    
+            }
+            
+        }
     }
 }
