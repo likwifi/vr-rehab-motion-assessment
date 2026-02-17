@@ -168,5 +168,19 @@ namespace Mediapipe.Unity.Tutorial
        {
            return repetitionCount;
        }
+       private float GetPositionByAxis(NormalizedLandmark joint)
+       {
+           switch (movementAxis)
+           {
+               case Axis.X:
+                   return joint.X;
+               case Axis.Y:
+                   return joint.Y;
+               case Axis.Z:
+                   return joint.Z;
+               default:
+                   return joint.Y; // Default to Y if axis is not specified
+           }
+       }
     }
 }
