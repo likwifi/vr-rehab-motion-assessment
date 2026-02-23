@@ -182,5 +182,9 @@ namespace Mediapipe.Unity.Tutorial
                    return joint.Y; // Default to Y if axis is not specified
            }
        }
+       public void SetThresholds(List<float> _thresholds)
+       {
+           thresholds = _thresholds;
+       }
     }
 }
