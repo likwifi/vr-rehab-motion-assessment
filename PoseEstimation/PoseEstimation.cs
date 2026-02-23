@@ -335,5 +335,21 @@ namespace Mediapipe.Unity.Tutorial
             character.BodyFullyVisible();
             // KidsCharacterController.BodyFullyVisible();
         }
+
+        private void BodyNotFullyVisible()
+        {
+            return;
+
+            // GameObject character = GameObject.Find("Character");
+            // AudioSource characterAudioSource = character.GetComponent<AudioSource>();
+            //
+            // yield return new WaitForSeconds(3f);
+            void ContinueWorkout()
+            {
+                Hide();
+            }
+
+            character.BodyNotFullyVisible(ContinueWorkout);
+        }
     }
 }
