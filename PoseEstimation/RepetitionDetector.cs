@@ -186,5 +186,23 @@ namespace Mediapipe.Unity.Tutorial
        {
            thresholds = _thresholds;
        }
+       public void SetMovementAxis([CanBeNull] string axis)
+       {
+           if (Enum.TryParse(axis, out Axis axisEnum))
+           {
+               movementAxis = axisEnum;
+           }
+           else
+           {
+               Debug.LogError("Failed to parse enum");
+           }
+       }
+
+       public void CleanUp()
+       {
+           primaryPositions = new List<float>();
+           secondaryPositions = null;
+           repetitionCount = 0;
+       }
     }
 }
