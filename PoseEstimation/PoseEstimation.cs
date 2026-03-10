@@ -351,5 +351,100 @@ namespace Mediapipe.Unity.Tutorial
 
             character.BodyNotFullyVisible(ContinueWorkout);
         }
+
+        public static void Hide()
+        {
+            Destroy(GameObject.Find("PoseEstimation(Clone)"));
+        }
+
+        private void OnDestroy()
+        {
+            if (_webCamTexture != null)
+            {
+                _webCamTexture.Stop();
+            }
+
+            if (_graph != null)
+            {
+                try
+                {
+                    _graph.CloseInputStream("input_video").AssertOk();
+                    _graph.WaitUntilDone().AssertOk();
+                }
+                finally
+                {
+                    _graph.Dispose();
+                }
+            }
+#if !UNITY_EDITOR_OSX && !UNITY_EDITOR_WIN
+    GpuManager.Shutdown();
+#endif
+        }
     }
 }
+
+
+// var correctMovesJson = KidsCharacterController.correctMovesJSON;
+// var analyzer = new PoseAnalyzer(_correctWorkout.ToString());
+// var fakeTipSend = false;
+
+/*
+
+var screenRect = _screen.GetComponent<RectTransform>().rect;
+
+int[][] feature = new int[33][];
+feature[14] = new int[] {33, 44 };
+int[][] anglesThreshold = new int[33][];
+anglesThreshold[14] = new[] { 10, 10 };
+var squatStart = new Keyframe(feature, anglesThreshold, "start squatting!");
+
+int[][] feature1 = new int[33][];
+feature1[24] = new int[] {33, 44 };
+int[][] anglesThreshold1 = new int[33][];
+anglesThreshold1[14] = new[] { 10, 10 };
+var deepSquat = new Keyframe(feature, anglesThreshold, "keep your thighs parallel to the ground");
+
+int[][] feature2 = new int[33][];
+feature2[23] = new int[] {33, 44 };
+int[][] anglesThreshold2 = new int[33][];
+anglesThreshold2[14] = new[] { 10, 10 };
+var squatEnd = new Keyframe(feature, anglesThreshold, "");
+
+var features = new List<Keyframe>{squatStart, deepSquat, squatEnd};
+var squatPoseCompliance = new PoseCompliance("squat", features );
+squatPoseCompliance.setOnCompliedFeedback((time) => { print("HOORAAAY, rep!");});
+
+PoseComplianceSet complianceSet = new PoseComplianceSet(new List<PoseCompliance> { squatPoseCompliance });*/
+
+
+// var complianceRules = ;
+// Temporal compliance
+// var poseGraph = new PoseGraph();
+
+
+/*
+FlutterMessage.SendMessage(detector.GetRepetitionCount().ToString(), "repsCount");
+}
+
+
+else
+{
+    if(!fakeTipSend)
+    {
+        StartCoroutine(fakeTip());
+        fakeTipSend = true;
+        // analyzer.StartPoseAnalysis(poseLandmarks.Landmark, currentTimestamp);
+    }
+    else
+    {
+        // poseLandmarks.Landmark
+        // var loadedMessage = new Message
+        // {
+        //     id = 0,
+        //     data = JsonUtility.ToJson(new SimilarityObjectMessage
+        //         { similarity = similarity, type = "poseSimilarity" })
+        // };
+        // Messages.Send(loadedMessage);
+        // analyzer.StartPoseAnalysis(poseLandmarks.Landmark, currentTimestamp);
+    }
+}*/
