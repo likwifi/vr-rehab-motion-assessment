@@ -49,5 +49,60 @@ namespace Mediapipe.Unity.Tutorial
 
             return sequence;
         }
+
+        // Compares a new sequence to all stored templates using DTW and returns the label of the best-matching template.
+        string ClassifySequence(float[] sequence)
+        {
+            float bestDistance = float.PositiveInfinity;
+            int bestMatch = -1;
+
+            // Iterate over each template to compute the DTW distance
+            for (int i = 0; i < templates.Count; i++)
+            {
+                float distance = DTWDistance(sequence, templates[i]);
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    bestMatch = i;
+                }
+            }
+
+            // Return the label associated with the template that has the minimum DTW distance
+            return labels[bestMatch];
+        }
+
+        // Implements the Dynamic Time Warping (DTW) algorithm to compute the distance between two sequences.
+        float DTWDistance(float[] s, float[] t)
+        {
+            int n = s.Length;
+            int m = t.Length;
+            float[,] dtw = new float[n + 1, m + 1];
+
+            // Initialize the DTW matrix with positive infinity
+            for (int i = 0; i <= n; i++)
+            {
+                for (int j = 0; j <= m; j++)
+                {
+                    dtw[i, j] = float.PositiveInfinity;
+                }
+            }
+
+            dtw[0, 0] = 0;
+
+            // Populate the DTW matrix with cumulative costs
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= m; j++)
+                {
+                    // Compute the local cost (absolute difference between the corresponding elements)
+                    float cost = Mathf.Abs(s[i - 1] - t[j - 1]);
+                    // Update the DTW cost matrix entry using the minimum of the three neighboring cells
+                    dtw[i, j] = cost + Mathf.Min(dtw[i - 1, j], Mathf.Min(dtw[i, j - 1], dtw[i - 1, j - 1]));
+                }
+            }
+
+            // The DTW distance between the two sequences is the cost in the bottom-right cell of the matrix
+            return dtw[n, m];
+        }
     }
 }
