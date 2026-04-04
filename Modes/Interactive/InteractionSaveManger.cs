@@ -16,5 +16,15 @@ namespace InteractiveModeScripts
             var jsonData = JsonUtility.ToJson(workout);
             File.WriteAllText(SaveFile +"/"+ workout.lessonName+".json", jsonData);
         }
+
+        public static InteractionWorkoutObj Load(string jsonData)
+        {
+            // Retrieve json data from storage of your choice
+            // var jsonData = File.ReadAllText(SaveFile);
+
+            // Then deserialize it back to an object
+            var saveData = JsonUtility.FromJson<InteractionWorkoutObj>(jsonData);
+            return saveData;
+        }
     }
 }
