@@ -166,5 +166,46 @@ namespace InteractiveModeScripts
                 _virtualCameras["Center"] = centerCamera.GetComponent<CinemachineVirtualCamera>();
             }
         }
+
+        private void SwitchVirtualCamera(CinemachineVirtualCamera virtualCamera)
+        {
+            foreach (var cinemachineVirtualCamera in _virtualCameras.Values)
+            {
+                cinemachineVirtualCamera.Priority = cinemachineVirtualCamera == virtualCamera ? 10 : 0;
+            }
+        }
+
+        /* Start of Calls from flutter */
+        public void setWorkoutJson(string workoutUrl)
+        {
+            // Debug.Log("Workout URL is ");
+            // Debug.Log(workoutUrl);
+            StartCoroutine(requestWorkoutJSON(workoutUrl));
+        }
+
+        public void speakUIMessageParallel(string message)
+        {
+            StartCoroutine(speak(message));
+        }
+
+        public void ShowVFX(string data)
+        {
+            var vfxID = data.Split("_")[0];
+            var text = data.Split("_")[1];
+            var vfxName = vfxID switch
+            {
+                "1" => "pop",
+                "2" => "pop_text",
+                "3" => "boom",
+                "4" => "electric",
+                "5" => "hit_blue",
+                "6" => "hit_yellow",
+                "7" => "slash_yellow",
+                "8" => "poof",
+                _ => "pop"
+            };
+
+            StartCoroutine(ProceedShowVFX(vfxName, text));
+        }
     }
 }
