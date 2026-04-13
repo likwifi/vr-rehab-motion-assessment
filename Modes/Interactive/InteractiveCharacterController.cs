@@ -207,5 +207,94 @@ namespace InteractiveModeScripts
 
             StartCoroutine(ProceedShowVFX(vfxName, text));
         }
+
+        private IEnumerator ShowVFXDummy(string vfxID)
+        {
+            yield return new WaitForSeconds(3);
+
+            StartCoroutine(ProceedShowVFX("pop", "Wuah"));
+            yield return new WaitForSeconds(3);
+            StartCoroutine(ProceedShowVFX("pop_text", "janeee"));
+            yield return new WaitForSeconds(3);
+            StartCoroutine(ProceedShowVFX("hit_yellow", "gnaac"));
+        }
+
+        private IEnumerator ProceedShowVFX(string vfxName, string text)
+        {
+            var vfxPrefab = (GameObject)Resources.Load("vfx/" + vfxName, typeof(GameObject));
+            var vfx = Instantiate(vfxPrefab, Vector3.zero, Quaternion.identity).transform;
+            vfx.parent = mainCamera.transform;
+            vfx.localPosition = new Vector3(0, 0, 2.5f);
+            vfx.localRotation = Quaternion.identity;
+            vfx.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            var particleText = vfx.GetComponentInChildren<CFXR_ParticleText>();
+            particleText.UpdateText(text);
+            yield return new WaitForSeconds(3);
+            Destroy(vfx.gameObject);
+        }
+
+        public void speakUIMessage(string message)
+        {
+            StartCoroutine(speak(message, (text) =>
+                {
+                    var r = new Random();
+                    var rInt = r.Next(0, 4);
+                    Debug.Log("neutral_talk" + rInt);
+                    CrossFadeMove("neutral_talk" + rInt, 0.3f);
+                    StartCoroutine(SwitchToMedium());
+                },
+                (text) =>
+                {
+                    Debug.Log("Idle");
+                    CrossFadeMove("Idle Pose", 0.3f);
+                    FlutterMessage.SendMessage("Speak_Idle");
+                    SwitchVirtualCamera(_virtualCameras["Wide"]);
+                }, false));
+        }
+
+        public void SetWorkout(string workoutString)
+        {
+            /*
+
+            animator.runtimeAnimatorController = Resources.Load("HIIT_All") as RuntimeAnimatorController;
+            */
+
+            // Debug.Log("Workout URL is ");
+            // Debug.Log(workoutUrl);
+            var animator = GetComponent<Animator>();
+            var workout = JObject.Parse(workoutString);
+            WorkoutType = (string)workout.GetValue("type");
+            var lessonJSON = (string)workout.GetValue("lessonJSON");
+
+            if (WorkoutType != null && animator.runtimeAnimatorController == null)
+            {
+                switch (WorkoutType)
+                {
+                    case "hiit":
+                    case "kids":
+                        animator.runtimeAnimatorController = Resources.Load("HIIT_All") as RuntimeAnimatorController;
+                        break;
+                    case "yoga":
+                        animator.runtimeAnimatorController = Resources.Load("Yoga_all") as RuntimeAnimatorController;
+                        break;
+                    case "martial":
+                        animator.runtimeAnimatorController =
+                            Resources.Load("Kickboxing_all") as RuntimeAnimatorController;
+                        break;
+                }
+            }
+
+            if (lessonJSON != null)
+            {
+                StartCoroutine(requestWorkoutJSON(lessonJSON));
+            }
+        }
+
+        public void nextMove(string obj)
+        {
+            // Debug.Log("Workout URL is ");
+            // Debug.Log(workoutUrl);
+            NextMoveFromController();
+        }
     }
 }
