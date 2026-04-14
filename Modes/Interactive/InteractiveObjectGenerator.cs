@@ -30,4 +30,18 @@ public class InteractiveObjectGenerator : MonoBehaviour
     {
         StartCoroutine(EnemyGenerator(interaction));
     }
+
+    private IEnumerator EnemyGenerator(InteractionObject interaction)
+    {
+        var numberOfObjects = interaction.ObjectsCount;
+        var stateName = interaction.StateName;
+        var generatorObject = interaction.GeneratorObject;
+        if (generatorObject != "")
+        {
+            if (block == null)
+            {
+                block = (GameObject)Resources.Load(generatorObject, typeof(GameObject));
+            }
+        }
+    }
 }
