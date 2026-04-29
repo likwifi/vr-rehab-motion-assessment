@@ -296,5 +296,73 @@ namespace InteractiveModeScripts
             // Debug.Log(workoutUrl);
             NextMoveFromController();
         }
+
+        public void skipPoseAnalysis(string obj)
+        {
+            PoseEstimation.Hide();
+            StartResumeWorkout();
+        }
+
+        public void hideControls(string obj)
+        {
+            ProgressBarGameObject1.SetActive(!obj.Equals("true"));
+        }
+
+        /* End of Calls from flutter */
+
+        private void InitWorkout(InteractionWorkoutObj workout)
+        {
+            if (workout != null)
+            {
+                // BLOCKER
+                if (WorkoutType.Equals("hiit"))
+                {
+                    CreateAvatars();
+                }
+
+                if (!string.IsNullOrEmpty(workout.speaker))
+                {
+                    _speaker = workout.speaker;
+                    _speakerStyle = workout.speakerStyle;
+                }
+
+                if (!string.IsNullOrEmpty(workout.localeCode))
+                {
+                    localeCode = workout.localeCode;
+                }
+
+                moves = workout.moves;
+                Debug.Log(moves == null ? "Moves Empty FROM INIT" : "Moves SET!!!!");
+
+                timerType = workout.timerType;
+                if (!MovementsPaused)
+                    StartCoroutine(nameof(PreWorkoutRunner));
+            }
+            else
+            {
+                // StartCoroutine(requestWorkoutJSON("https://firebasestorage.googleapis.com/v0/b/optical-net-91011.appspot.com/o/classes%2FHana%2Fjson%2Flesson1.json?alt=media&token=e39ff666-03eb-4cea-b3a8-7975f9b4cef1"));
+            }
+        }
+
+        private void NextMove()
+        {
+            moveIndex++;
+            // assuming first move is greeting message
+            if (moveIndex == 1)
+            {
+                FlutterMessage.SendMessage("WORKOUT_STARTED");
+                if (ProgressBarGameObject1 != null)
+                    ProgressBarGameObject1.SetActive(true);
+            }
+
+            FlutterMessage.SendMessage((moves.Count - 1).ToString(), "workoutMovesCount");
+            FlutterMessage.SendMessage(moveIndex.ToString(), "workoutMoveIndex");
+
+            workoutFinished = moveIndex == moves.Count - 1;
+            if (moveIndex < moves.Count)
+            {
+                StartCoroutine(nameof(WorkoutRunner), moves[moveIndex]);
+            }
+        }
     }
 }
