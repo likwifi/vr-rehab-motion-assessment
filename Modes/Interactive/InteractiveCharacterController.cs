@@ -364,5 +364,157 @@ namespace InteractiveModeScripts
                 StartCoroutine(nameof(WorkoutRunner), moves[moveIndex]);
             }
         }
+
+        public IEnumerator requestWorkoutJSON(string workoutUrl)
+        {
+            var text = workoutUrl;
+            if (!workoutUrl.StartsWith("{"))
+            {
+                Debug.Log("Requesting Workout");
+                UnityWebRequest www = UnityWebRequest.Get(workoutUrl);
+                www.SetRequestHeader("Accept", "application/json");
+                yield return www.Send();
+                text = www.downloadHandler.text;
+            }
+
+            var workout = InteractionSaveManger.Load(text);
+            InitWorkout(workout);
+            Debug.Log("Workout Loaded");
+        }
+
+        public override void StartResumeWorkout()
+        {
+            Debug.Log("start resume workout Paused");
+            if (!MovementsPaused) return;
+            MovementsPaused = false;
+            Debug.Log("start resume workout Proceed");
+
+            StartCoroutine(nameof(PreWorkoutRunner));
+        }
+
+        protected override void Pause()
+        {
+            MovementsPaused = true;
+            StopAllCoroutines();
+            if (WorkoutType.Equals("hiit"))
+            {
+                orbitCamera.ResetOrbit();
+            }
+
+            CrossFadeMove("Idle Pose", 0.5f);
+        }
+
+        protected IEnumerator PreWorkoutRunner()
+        {
+            Debug.Log("Pre Workout Method");
+            if (moves == null)
+            {
+                Debug.Log("Moves EMPTY!!!");
+            }
+
+            yield return new WaitUntil(() => moves != null);
+            Debug.Log("Workout Started");
+            StartCoroutine(nameof(WorkoutRunner), moves[moveIndex]);
+        }
+
+        protected override IEnumerator WorkoutRunner(InteractionObject interaction)
+        {
+            currentInteraction = interaction;
+            // if (moveObj.BeforeAnnounceAnimationName != null)
+            //     m_Animator.CrossFade(moveObj.BeforeAnnounceAnimationName, moveObj.TransitionDuration);
+            //
+            // var duration = moveObj.AfterAnnounceAnimationTime;
+            var totalDuration = interaction.Repeating || generatorExists
+                ? interaction.ObjectsCount * interaction.TotalDuration
+                : interaction.TotalDuration;
+            totalCounts = interaction.ObjectsCount;
+            // totalCounts = moveObj.TotalRepeats;
+            /*if (interaction.AnnounceText == "")
+            {
+                m_Animator.CrossFade(interaction.StateName, 0.5f);
+                NextMove();
+                // callbackOnPlay("", interaction, totalDuration);
+                // yield return new WaitForSeconds(interaction.TotalDuration);
+            }
+            else
+            {*/
+
+
+            // VoiceController.StopListening();
+
+            yield return new WaitUntil(() => !characterAudioSource.isPlaying);
+            var announceTextFinished = false;
+            // var textAnnounced = false;
+            var parallelTextFinished = false;
+
+            var hasParallelAnnounceText = interaction.ParallelAnnounceText != null;
+            var hasAnnounceText = interaction.AnnounceText != null;
+            var inAction = false;
+
+            if (hasAnnounceText)
+            {
+                // announceTextFinished = false;
+                yield return speak(interaction.AnnounceText, (text) =>
+                    {
+                        /*if (interaction.StateName != "Idle Pose")
+                            return;
+                            */
+
+                        if ((WorkoutType.Equals("hiit") || WorkoutType.Equals("kids"))
+                            && m_Animator.GetCurrentAnimatorStateInfo(0).IsTag("idle"))
+                        {
+                            var r = new Random();
+                            var rInt = r.Next(0, 4);
+                            CrossFadeMove("neutral_talk" + rInt, 0.1f);
+                        }
+
+                        StartCoroutine(SwitchToMedium());
+                    },
+                    (text) =>
+                    {
+                        /*
+                        var camera = _cameras["Wide"];
+                        StartCoroutine(CameraLerp(camera.transform.localPosition, camera.transform.localRotation));
+                        */
+                        announceTextFinished = true;
+                        StartCoroutine(callbackOnPlay(text, interaction, totalDuration));
+                        inAction = true;
+                    });
+                yield return new WaitUntil(() => announceTextFinished);
+            }
+
+            if (hasParallelAnnounceText)
+            {
+                yield return speak(interaction.ParallelAnnounceText,
+                    (text) =>
+                    {
+                        if (!inAction)
+                        {
+                            StartCoroutine(ParallelAnnounceCallback(interaction.ExerciseStartDelay, text, interaction,
+                                totalDuration));
+                        }
+                    }, (str) => { parallelTextFinished = true; });
+
+                yield return new WaitUntil(() => parallelTextFinished);
+            }
+
+            if (interaction.ObjectsCount > 1)
+            {
+                FlutterMessage.SendMessage("showNextBtn", "ui");
+            }
+
+            FlutterMessage.SendMessage(interaction.TotalDuration + "", "exerciseDuration");
+
+            if (workoutFinished)
+            {
+                FlutterMessage.SendMessage("WORKOUT_ENDED");
+                CelebrateWorkout();
+                if (poseEstimation.gameObject != null)
+                {
+                    Destroy(poseEstimation.gameObject.transform.parent.gameObject);
+                }
+                // SceneManager.LoadScene(2, LoadSceneMode.Additive);
+            }
+        }
     }
 }
