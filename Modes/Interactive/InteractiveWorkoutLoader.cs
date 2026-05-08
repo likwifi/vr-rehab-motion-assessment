@@ -33,4 +33,42 @@ public class InteractiveWorkoutLoader : MonoBehaviour
                 StartCoroutine(helperPromptCoroutine);
             });
     }
+
+    private IEnumerator helperPrompt()
+    {
+        yield return new WaitForSeconds(8);
+        character.StopListening();
+        yield return character.speak(localeBundle["jamieHelperPrompt"], null,
+            (object text) => { character.StartListening(VoiceCallback); });
+    }
+
+    private void VoiceCallback(string result)
+    {
+        var resultStr = result;
+
+        Debug.Log(resultStr);
+
+        var hiitWords = new List<string>
+            { localeBundle["hiit"], localeBundle["strength"], localeBundle["core"], localeBundle["hiitW"] };
+        var martialWords = new List<string> { localeBundle["martial"], localeBundle["boxing"], localeBundle["kick"] };
+        var yoga = localeBundle["yoga"];
+        var kids = localeBundle["kids"];
+        foreach (var hiitWord in hiitWords)
+        {
+            if (resultStr.IndexOf(hiitWord, StringComparison.OrdinalIgnoreCase) > -1)
+            {
+                WorkoutFound("HIIT");
+                return;
+            }
+        }
+
+        foreach (var word in martialWords)
+        {
+            if (resultStr.IndexOf(word, StringComparison.OrdinalIgnoreCase) > -1)
+            {
+                WorkoutFound("MARTIAL");
+                return;
+            }
+        }
+    }
 }
