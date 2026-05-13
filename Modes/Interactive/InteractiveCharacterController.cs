@@ -516,5 +516,154 @@ namespace InteractiveModeScripts
                 // SceneManager.LoadScene(2, LoadSceneMode.Additive);
             }
         }
+
+        private void CelebrateWorkout()
+        {
+            var oldCanvas = GameObject.Find("Canvas") as GameObject;
+            if (oldCanvas != null)
+            {
+                oldCanvas.SetActive(false);
+            }
+
+            var land = GameObject.Find("Land");
+            if (land != null)
+            {
+                land.SetActive(false);
+            }
+
+            var volume = mainCamera.GetComponent<Volume>();
+            if (volume != null)
+            {
+                volume.enabled = false;
+            }
+
+            // characterObj.GetComponentsInChildren();
+            var victoryCanvas = Instantiate(Resources.Load("VictoryCanvas")) as GameObject;
+            var canvas = victoryCanvas.GetComponent<Canvas>();
+
+            // canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            if (_virtualCameras.ContainsKey("Center"))
+            {
+                SwitchVirtualCamera(_virtualCameras["Center"]);
+            }
+
+            if (victoryBg.a != 0)
+            {
+                var bgImage = GameObject.Find("VictoryBackground").GetComponent<Image>();
+                bgImage.color = victoryBg;
+            }
+
+            canvas.worldCamera = mainCamera.GetComponent<Camera>();
+            var r = new Random();
+            int rInt;
+            var state = "victory";
+            switch (WorkoutType)
+            {
+                case "hiit":
+                case "kids":
+                    rInt = r.Next(0, 4);
+                    state = "victory" + rInt;
+                    break;
+                case "martial":
+                    rInt = r.Next(0, 1);
+                    state = "victory" + rInt;
+                    break;
+            }
+
+            CrossFadeMove(state, 0f);
+        }
+
+        private IEnumerator SwitchToMedium()
+        {
+            yield return new WaitForSeconds(0.6f);
+            if (!m_Animator.GetCurrentAnimatorStateInfo(0).IsTag("idle"))
+                yield break;
+
+            var camera = _cameras["Medium"];
+            if (camera != null)
+                StartCoroutine(CameraLerp(camera.transform.localPosition, camera.transform.localRotation));
+            var virtualCamera = _virtualCameras["Medium"];
+            if (virtualCamera != null)
+                SwitchVirtualCamera(virtualCamera);
+        }
+
+
+        private void NextMoveFromController()
+        {
+            StopAllCoroutines();
+            var interaction = moves[moveIndex];
+            if (interaction.BackToIdleState != "")
+            {
+                CrossFadeMove(interaction.BackToIdleState, 0.2f);
+            }
+
+            StartCoroutine(ExecuteAfterTime(interaction.BackToIdleStateDuration, () =>
+            {
+                if (interaction.backToIdle)
+                {
+                    var idleState = interaction.IdleState ?? "Idle Pose";
+                    CrossFadeMove(idleState, 0.2f);
+                }
+
+                if (WorkoutType.Equals("hiit"))
+                {
+                    orbitCamera.ResetOrbit();
+                }
+
+                ResetCounter();
+                NextMove();
+            }));
+        }
+
+        /*private IEnumerator ListenForExerciseControls(InteractionObject interaction)
+        {
+            // var callbackRecieved = false;
+            void CallBack(string result)
+            {
+                // callbackRecieved = true;
+                Debug.Log("Voice result is " + result);
+                const string positiveWord1 = "next";
+                // const string positiveWord2 = "next move";
+                string[] positiveWords = { positiveWord1 };
+                var flutterMessage = new FlutterMessage("result", result);
+                UnityMessageManager.Instance.SendMessageToFlutter(JsonUtility.ToJson(flutterMessage));
+
+                if (!HasPositiveWords(positiveWords, result))
+                {
+                    return;
+                }
+
+                NextMoveFromController();
+                VoiceController.StopListening();
+                ToggleBgMusic(false);
+            }
+
+            ToggleBgMusic(true);
+            VoiceController.StartListening(CallBack);
+            yield return new WaitForSeconds(4f);
+            // yield return new WaitUntil(()=>!callbackRecieved);
+            ToggleBgMusic(false);
+            VoiceController.StopListening();
+        }*/
+
+        private bool HasPositiveWords(string[] positiveWords, string str)
+        {
+            for (int i = 0; i < positiveWords.Length; i++)
+            {
+                if (str.IndexOf(positiveWords[i], StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private IEnumerator ParallelAnnounceCallback(float interactionExerciseStartDelay, object text,
+            InteractionObject interaction, float totalDuration)
+        {
+            yield return new WaitForSeconds(interactionExerciseStartDelay);
+            StartCoroutine(callbackOnPlay(text, interaction, totalDuration));
+        }
     }
 }
