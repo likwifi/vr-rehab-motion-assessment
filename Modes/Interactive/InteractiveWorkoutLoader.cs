@@ -70,5 +70,26 @@ public class InteractiveWorkoutLoader : MonoBehaviour
                 return;
             }
         }
+
+        if (resultStr.IndexOf(yoga, StringComparison.OrdinalIgnoreCase) > -1)
+        {
+            WorkoutFound("YOGA");
+            return;
+        }
+        else if (resultStr.IndexOf(kids, StringComparison.OrdinalIgnoreCase) > -1)
+        {
+            WorkoutFound("KIDS");
+            return;
+        }
+    }
+
+    private void WorkoutFound(string type)
+    {
+        StopCoroutine(helperPromptCoroutine);
+        character.StopListening();
+        character.setSpeaker("Tony");
+        character.setSpeakerStyle("Friendly");
+        StartCoroutine(character.speak(string.Format(localeBundle["workoutFound"], type), null,
+            (object text) => { FlutterMessage.SendMessage("FIND_" + type); }));
     }
 }
