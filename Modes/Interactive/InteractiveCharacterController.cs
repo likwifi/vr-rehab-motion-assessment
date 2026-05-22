@@ -665,5 +665,75 @@ namespace InteractiveModeScripts
             yield return new WaitForSeconds(interactionExerciseStartDelay);
             StartCoroutine(callbackOnPlay(text, interaction, totalDuration));
         }
+
+        private IEnumerator CameraLerpRotation(Quaternion interactionCameraRotation)
+        {
+            float timeElapsed = 0;
+            const float lerpDuration = 1f;
+            var start = mainCamera.transform.localRotation;
+            // Vector3 valueToLerp;
+
+            while (timeElapsed < lerpDuration)
+            {
+                mainCamera.transform.localRotation =
+                    Quaternion.Lerp(start, interactionCameraRotation, timeElapsed / lerpDuration);
+                // valueToLerp = Mathf.Lerp(startValue, endValue, timeElapsed / lerpDuration);
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        private void CrossFadeMove(string state, float duration)
+        {
+            m_Animator.CrossFade(state, duration);
+            currentAnimatorState = state;
+            FlutterMessage.SendMessage(currentAnimatorState, "moveName");
+            // currentAnimatorState
+        }
+
+        private IEnumerator CameraLerp(Vector3? interactionCameraPosition, Quaternion? interactionCameraRotation)
+        {
+            float timeElapsed = 0;
+            const float lerpDuration = 1f;
+            var startRotation = mainCamera.transform.localRotation;
+            var startPosition = mainCamera.transform.localPosition;
+
+            while (timeElapsed < lerpDuration)
+            {
+                if (interactionCameraRotation != null)
+                {
+                    mainCamera.transform.localRotation =
+                        Quaternion.Lerp(startRotation, (Quaternion)interactionCameraRotation,
+                            timeElapsed / lerpDuration);
+                }
+
+                if (interactionCameraPosition != null)
+                {
+                    mainCamera.transform.localPosition =
+                        Vector3.Lerp(startPosition, (Vector3)interactionCameraPosition, timeElapsed / lerpDuration);
+                }
+
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+        }
+
+        private IEnumerator CameraLerpPosition(Vector3 interactionCameraPosition)
+        {
+            float timeElapsed = 0;
+            const float lerpDuration = 1f;
+            var start = mainCamera.transform.localPosition;
+            // Vector3 valueToLerp;
+
+            while (timeElapsed < lerpDuration)
+            {
+                mainCamera.transform.localPosition =
+                    Vector3.Lerp(start, interactionCameraPosition, timeElapsed / lerpDuration);
+                // valueToLerp = Mathf.Lerp(startValue, endValue, timeElapsed / lerpDuration);
+                timeElapsed += Time.deltaTime;
+                yield return null;
+            }
+            // valueToLerp = interactionCameraPosition;
+        }
     }
 }
