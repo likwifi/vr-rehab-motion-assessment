@@ -735,5 +735,138 @@ namespace InteractiveModeScripts
             }
             // valueToLerp = interactionCameraPosition;
         }
+
+        private IEnumerator callbackOnPlay(object text, InteractionObject interaction, float totalDuration)
+        {
+            if (interaction.ExerciseStartDelay > 0f)
+            {
+                yield return new WaitForSeconds(interaction.ExerciseStartDelay);
+            }
+
+
+            if (interaction.camera != null)
+            {
+                var camera = _cameras[interaction.camera];
+
+                if (camera != null)
+                {
+                    StartCoroutine(!interaction.cameraRotation.Equals(Quaternion.identity)
+                        ? CameraLerp(camera.transform.localPosition, camera.transform.localRotation)
+                        : CameraLerp(defaultMainCameraPosition, defaultMainCameraRotation));
+                }
+
+                var virtualCamera = _virtualCameras[interaction.camera];
+                if (virtualCamera != null)
+                {
+                    SwitchVirtualCamera(virtualCamera);
+                }
+            }
+            else
+            {
+                var virtualCamera = _virtualCameras["Wide"];
+
+                if (virtualCamera != null)
+                {
+                    SwitchVirtualCamera(virtualCamera);
+                }
+                else
+                {
+                    StartCoroutine(!interaction.cameraPosition.Equals(Vector3.zero)
+                        ? CameraLerpPosition(interaction.cameraPosition)
+                        : CameraLerpPosition(defaultMainCameraPosition));
+
+                    StartCoroutine(!interaction.cameraRotation.Equals(Quaternion.identity)
+                        ? CameraLerpRotation(interaction.cameraRotation)
+                        : CameraLerpRotation(defaultMainCameraRotation));
+                }
+            }
+
+            // if (_virtualCameras)
+
+            if (interaction.Repeating)
+            {
+                // var duration  = getAnimatorStateDuration(interaction.StateName);
+                // var aa = RuntimeAnimatorController.animationClips;
+                // m_Animator.states
+
+                CrossFadeMove(interaction.StateName, 0.1f);
+                // currentAnimatorState = interaction.StateName;
+
+                if (totalDuration > 20 && orbitCamera != null && WorkoutType.Equals("hiit"))
+                {
+                    // No need for orbit when 3 users 
+                    orbitCamera.StartOrbit(totalDuration);
+                }
+
+                StartCounter(interaction.TotalDuration, totalDuration);
+                StartCoroutine(ExecuteAfterTime(totalDuration, () =>
+                {
+                    if (!string.IsNullOrEmpty(interaction.BackToIdleState))
+                    {
+                        CrossFadeMove(interaction.BackToIdleState, 0.1f);
+                    }
+
+                    StartCoroutine(ExecuteAfterTime(interaction.BackToIdleStateDuration, () =>
+                    {
+                        if (interaction.backToIdle)
+                        {
+                            var idleState = interaction.IdleState ?? "Idle Pose";
+                            CrossFadeMove(idleState, 0.1f);
+                        }
+
+                        NextMove();
+                    }));
+                }));
+            }
+            else if (interaction.StateName != "" && generatorExists)
+            {
+                generator.SendMessage("StartGenerator", interaction);
+                StartCounter(interaction.TotalDuration, totalDuration);
+                interactionName = interaction.StateName;
+            }
+            else
+            {
+                StartCoroutine(ExecuteAfterTime(totalDuration, NextMove));
+            }
+        }
+
+
+        private float getAnimatorStateDuration(string interactionStateName)
+        {
+            m_Animator.Play(interactionStateName);
+            var currInfo = m_Animator.GetCurrentAnimatorStateInfo(0);
+            var clips = m_Animator.GetCurrentAnimatorClipInfo(0);
+            Debug.Log("clips:" + clips.Length);
+
+            // Debug.Log(currInfo.length);
+            return clips.Length;
+        }
+
+        // called from Attacking Cube OnTriggerEnter
+        public void OnInteraction()
+        {
+            CrossFadeMove(interactionName, 0.1f);
+            UpdateCounter();
+            StartCoroutine(playTrails());
+        }
+
+        private IEnumerator playTrails()
+        {
+            if (trail != null)
+            {
+                yield return new WaitForSeconds(0.5f);
+                trail.Play();
+            }
+        }
+
+        public void setSpeaker(string speaker)
+        {
+            _speaker = speaker;
+        }
+
+        public void setSpeakerStyle(string style)
+        {
+            _speakerStyle = style;
+        }
     }
 }
