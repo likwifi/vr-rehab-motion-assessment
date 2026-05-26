@@ -85,5 +85,97 @@ namespace InteractiveModeScripts
 
             // ClipCurves.Add(new ClipInfo(animator.runtimeAnimatorController.animationClips[0],  new List<CurveInfo>())); 
         }
+
+        public static void CollectAnimatorStatesInfo(Animator m_Animator)
+        {
+            var stringJSON = "";
+            var runtimeAnimatorController = m_Animator.runtimeAnimatorController;
+            if (runtimeAnimatorController != null)
+            {
+                var clips = runtimeAnimatorController.animationClips;
+                var states = ((UnityEditor.Animations.AnimatorController)m_Animator.runtimeAnimatorController).layers[0]
+                    .stateMachine.states;
+                stringJSON += "[";
+                MovesJson movesJSON = new MovesJson();
+                for (var i = 0; i < clips.Length; i++)
+                {
+                    var stateName = states[i].state.name;
+                    if (stateName.IndexOf("_rev", StringComparison.OrdinalIgnoreCase) > -1 ||
+                        stateName.IndexOf("rev_", StringComparison.OrdinalIgnoreCase) > -1 ||
+                        stateName.IndexOf("_idle", StringComparison.OrdinalIgnoreCase) > -1 ||
+                        stateName.IndexOf("idle_", StringComparison.OrdinalIgnoreCase) > -1)
+                    {
+                        continue;
+                    }
+
+                    var idleIndex = findState(stateName, states, "_idle");
+                    var revIndex = findState(stateName, states, "_rev");
+                    var duration = clips[i].length;
+                    var moveJSON = new MoveJson
+                    {
+                        StateName = stateName,
+                        backToIdle = true,
+                        Repeating = clips[i].isLooping,
+                        TotalDuration = duration,
+                        filePath = AssetDatabase.GetAssetPath(clips[i])
+                    };
+                    if (idleIndex > -1)
+                    {
+                        moveJSON.Repeating = clips[idleIndex].isLooping;
+                        moveJSON.TotalDuration = clips[idleIndex].length;
+                    }
+
+                    if (revIndex > -1)
+                    {
+                        moveJSON.BackToIdleState = states[revIndex].state.name;
+                        moveJSON.BackToIdleStateDuration = clips[revIndex].length;
+                    }
+
+                    /*if (stateName.IndexOf("_rev", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                        stateName.IndexOf("rev_", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        stringJSON = stringJSON.Remove(stringJSON.Length - 2, 2);
+                        stringJSON += ",\"BackToIdleState\":";
+                        stringJSON += "\"" + stateName + "\",";
+                        stringJSON += "\"BackToIdleStateDuration\":";
+                        stringJSON += duration;
+                        stringJSON += "},";
+                        continue;
+                    }
+
+                    if (stateName.IndexOf("_idle", StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        stringJSON = stringJSON.Remove(stringJSON.Length - 2, 2);
+                        stringJSON += "\"IdleDuration\":";
+                        stringJSON += duration;
+                        stringJSON += "},";
+                        // TODO add up idle duration
+                        continue;
+                    }*/
+
+                    /*
+                    stringJSON += "{";
+                    stringJSON += "\"TotalDuration\":";
+                    stringJSON += duration + ",";
+                    stringJSON += "\"StateName\":";
+                    stringJSON += "\"" + stateName + "\",";
+                    stringJSON += "\"backToIdle\":";
+                    stringJSON += "\"" + true + "\",";
+                    stringJSON += "\"Repeating\":";
+                    stringJSON += clips[i].isLooping.ToString().ToLower();
+                    stringJSON += "},";
+                    */
+
+
+                    movesJSON.moves.Add(moveJSON);
+                }
+
+                // stringJSON += "]";
+                var JSON = JsonUtility.ToJson(movesJSON);
+                System.IO.File.WriteAllText(Application.persistentDataPath + "/kickboxing.json", JSON);
+
+                // Debug.Log(JSON);
+            }
+        }
     }
 }
