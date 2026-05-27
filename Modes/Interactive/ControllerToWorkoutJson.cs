@@ -177,5 +177,30 @@ namespace InteractiveModeScripts
                 // Debug.Log(JSON);
             }
         }
+
+        private static int findState(string stateName, ChildAnimatorState[] states, string query)
+        {
+            for (var i = 0; i < states.Length; i++)
+            {
+                if (states[i].state.name.Equals(stateName + query, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        [Serializable]
+        public class MoveJson
+        {
+            public float TotalDuration;
+            public string StateName;
+            public string BackToIdleState;
+            public bool backToIdle;
+            public bool Repeating;
+            public float BackToIdleStateDuration;
+            public string filePath;
+        }
     }
 }
