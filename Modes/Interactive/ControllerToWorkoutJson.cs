@@ -202,5 +202,12 @@ namespace InteractiveModeScripts
             public float BackToIdleStateDuration;
             public string filePath;
         }
+
+        [Serializable]
+        public class MovesJson
+        {
+            public List<MoveJson> moves = new();
+        }
     }
 }
+#endif
