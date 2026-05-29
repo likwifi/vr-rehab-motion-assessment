@@ -1,0 +1,31 @@
+// var warmup0 = new InteractionObject("", 0, "Hello space traveler! I will need your help to save my little island. Lets begin our workout with quick warmup.");
+// var warmup1 = new InteractionObject("JumpingJacks", 10, "10 Jumping jacks in 3. 2. 1. Start!", 1.71f, true);
+// var warmup2 = new InteractionObject("FeetWarmup", 3, "3 Feet Warmup in 3. 2. 1. Start!", 7.23f, true);
+// var warmup3 = new InteractionObject("HighKnees", 20, "10 High Knees in 3. 2. 1. Start!", 1.1f, true);
+// var warmup4 = new InteractionObject("JumpingChangeFeet", 7,
+//     "7 Jumping Change Feet in 3. 2. 1. Start!",
+//     1.2f, true);
+//
+// var int1 = new InteractionObject("Hit", 20,
+//     "meteorites incoming! let blow up them with different types of punches.  hit asteroids. in 3. 2. 1. Start!");
+// var int2 = new InteractionObject("Jab", 20, "Jabs now, in 3. 2. 1. Start!");
+// var int3 = new InteractionObject("Uppercut", 20,
+//     "Lets smash more meteorites with Uppercut! in 3. 2. 1. Start!" );
+// var int4 = new InteractionObject("StraightPunch", 20, "Straight Punches. in 3. 2. 1. Start!" );
+// var int5 = new InteractionObject("PunchJab", 20, "Double punch and jab. in 3. 2. 1. Start!");
+// moves = new MovesList<InteractionObject>
+//     {warmup0, warmup1, warmup2, warmup3, warmup4, int1, int2, int3, int4, int5 };
+//
+// var workout = new InteractionWorkoutObj("Shannon Lesson 1","Jenny", "excited", moves);
+// InteractionSaveManger.Save(workout);
+
+
+// Jamie
+var warmup0 = new InteractionObject("greet", 1, "", 3.5f, true);
+var greet0 = new InteractionObject("", 0,
+"Hello fellows! What an amazing day! Lets begin our workout with quick warmup.");
+var warmup1 = new InteractionObject("Squat", 10, "10 Air Squats in 3. 2. 1. Start!", 1.833f, true);
+var warmup2 = new InteractionObject("jumping_jack", 12, "12 Jumping Jacks in 3. 2. 1. Start!", 1.833f, true);
+var warmup3 = new InteractionObject("start_plank", 1, "12 seconds plank in 3. 2. 1. Start!", 13f, true,
+false);
+var warmup4 = new InteractionObject("end_plank", 1, "Well done!", 3.8f, true);
