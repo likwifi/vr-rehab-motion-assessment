@@ -27,4 +27,16 @@ public static class SaveManager
         var saveData = JsonUtility.FromJson<PerformanceWorkoutObj>(jsonData);
         return saveData;
     }
+    public static MovesList<MoveObj> Load1(string jsonData)
+    {
+        // Retrieve json data from storage of your choice
+        // var jsonData = File.ReadAllText(SaveFile);
+        
+        // Then deserialize it back to an object
+        var saveData = JsonUtility.FromJson<MovesList<MoveObj>>(jsonData);
+        return saveData;
+    }
+    
+
+
 }
