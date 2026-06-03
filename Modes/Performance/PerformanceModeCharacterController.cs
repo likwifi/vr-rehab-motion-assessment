@@ -34,4 +34,11 @@ public class PerformanceModeCharacterController : CharacterControllerBase
         // SaveManager.Save(workout);
         StartCoroutine(nameof(WorkoutRunner), moves[0]);
     }
+
+    private void NextMove()
+    {
+        moveIndex++;
+        if (moveIndex < moves.Count)
+            StartCoroutine(nameof(WorkoutRunner), moves[moveIndex]);
+    }
 }
