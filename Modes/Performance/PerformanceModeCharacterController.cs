@@ -41,4 +41,29 @@ public class PerformanceModeCharacterController : CharacterControllerBase
         if (moveIndex < moves.Count)
             StartCoroutine(nameof(WorkoutRunner), moves[moveIndex]);
     }
+
+
+    private IEnumerator WorkoutRunner(MoveObj moveObj)
+    {
+        // foreach (MoveObj moveObj in movements)
+        // {
+        if (moveObj.BeforeAnnounceAnimationName != null)
+            m_Animator.CrossFade(moveObj.BeforeAnnounceAnimationName, moveObj.TransitionDuration);
+
+        var duration = moveObj.AfterAnnounceAnimationTime;
+        var totalDuration = duration * moveObj.TotalRepeats;
+        totalCounts = moveObj.TotalRepeats;
+        yield return GetAudioClipService(moveObj.AnnounceText, null, (text) =>
+        {
+            if (moveObj.AfterAnnounceAnimationName != null)
+            {
+                m_Animator.CrossFade(moveObj.AfterAnnounceAnimationName, 0.5f);
+                StartCounter(duration, totalDuration);
+                // InvokeRepeating(nameof(UpdateCounter), 0.5f, duration);
+                // StartCoroutine(ExecuteAfterTime(totalDuration, () => { ResetCounter(); }));
+            }
+            StartCoroutine(ExecuteAfterTime(totalDuration, NextMove));
+        });
+        // }
+    }
 }
