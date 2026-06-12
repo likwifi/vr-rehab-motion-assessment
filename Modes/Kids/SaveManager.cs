@@ -15,5 +15,16 @@ namespace Lessons.Hatsune
             var jsonData = JsonUtility.ToJson(data);
             File.WriteAllText(SaveFile, jsonData);
         }
+
+        public static MovesList<MoveObj> Load(string jsonData)
+        {
+            // Retrieve json data from storage of your choice
+            // var jsonData = File.ReadAllText(SaveFile);
+        
+            // Then deserialize it back to an object
+            var saveData = JsonUtility.FromJson<MovesList<MoveObj>>(jsonData);
+            return saveData;
+        }
+
     }
 }
