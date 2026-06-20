@@ -82,4 +82,34 @@ public class AvatarController : MonoBehaviour
 
         MatchScales();
     }
+
+    private Bounds GetHeight(GameObject cmp)
+    {
+        Renderer[] renderers = cmp.GetComponentsInChildren<Renderer>();
+
+        if (renderers.Length == 0)
+        {
+            Debug.LogWarning("No Renderer components found in children.");
+        }
+
+        Bounds totalBounds = renderers[0].bounds;
+
+        foreach (Renderer rend in renderers)
+        {
+            totalBounds.Encapsulate(rend.bounds);
+        }
+
+        return totalBounds;
+    }
+
+    private void MatchScales()
+    {
+        var character = GameObject.Find("Character");
+        var b1 = GetHeight(avatar);
+        var b2 = GetHeight(character);
+        var scale = b2.size.y / b1.size.y;
+        scale *= 1.05f;
+        Debug.Log(b2.size.y / b1.size.y);
+        transform.localScale = new Vector3(scale, scale, scale);
+    }
 }
