@@ -112,4 +112,40 @@ public class AvatarController : MonoBehaviour
         Debug.Log(b2.size.y / b1.size.y);
         transform.localScale = new Vector3(scale, scale, scale);
     }
+
+    bool dummyStarted = false;
+    bool avatarStarted = false;
+    private string currentDummyRepState = "";
+    private string currentAvatarRepState = "";
+    private Coroutine avatarCoroutine; // Store the running coroutine
+
+
+    public void UpdateAvatar(RepState repState)
+    {
+        var animator = avatar.GetComponent<Animator>();
+
+        if (!avatarStarted)
+        {
+            animator.CrossFade(repState.stateName, 0.2f);
+            // avatarStarted = true;
+            if (avatarCoroutine != null)
+            {
+                StopCoroutine(avatarCoroutine);
+            }
+        }
+
+        avatarCoroutine = StartCoroutine(TransitionAfterDuration(animator, repState.totalDuration+0.2f));
+    }
+
+
+    public void UpdateDummy(RepState repState)
+    {
+        // Debug.Log(repState.stateName);
+        if (currentDummyRepState != repState.stateName)
+        {
+            StopAllCoroutines();
+            dummyStarted = false;
+            currentDummyRepState = repState.stateName;
+        }
+    }
 }
