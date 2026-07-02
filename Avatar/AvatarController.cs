@@ -147,5 +147,44 @@ public class AvatarController : MonoBehaviour
             dummyStarted = false;
             currentDummyRepState = repState.stateName;
         }
+        else if (!dummyStarted)
+        {
+            var trainerInteraction = InteractiveCharacterController.Instance.currentInteraction;
+
+            var count = trainerInteraction.ObjectsCount;
+            var totalTime = repState.totalDuration * count;
+            var animator = dummy.GetComponent<Animator>();
+            // Random value between 30% and 70% of count
+            var dummyCount = Random.Range((int)Math.Round(count * 0.3), (int)Math.Round(count * 0.7));
+
+            // animator.CrossFade(repState.stateName, 0);
+            // StartCoroutine(TransitionAfterDuration(animator, repState.totalDuration));
+            StartCoroutine(RunDummyCount(animator, totalTime, dummyCount, repState.stateName, repState.totalDuration));
+            dummyStarted = true;
+        }
+    }
+
+    private void Update()
+    {
+        // Update the UI text position
+        avatarText.transform.position = Camera.main.WorldToScreenPoint(avatar.transform.position);
+        dummyText.transform.position = Camera.main.WorldToScreenPoint(dummy.transform.position);
+    }
+
+    private IEnumerator RunDummyCount(Animator anim, float totalTime, int dummyCount, string stateName, float repTime)
+    {
+        var intervals = new float[dummyCount];
+        var sum = 0f;
+        for (var i = 0; i < dummyCount; i++)
+        {
+            intervals[i] = Random.Range(0.5f, 1.5f);
+            sum += intervals[i];
+        }
+
+        // Scale each random interval so that their total equals totalTime
+        for (var i = 0; i < dummyCount; i++)
+        {
+            intervals[i] = intervals[i] / sum * totalTime;
+        }
     }
 }
