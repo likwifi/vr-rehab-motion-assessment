@@ -186,5 +186,60 @@ public class AvatarController : MonoBehaviour
         {
             intervals[i] = intervals[i] / sum * totalTime;
         }
+
+        Debug.Log(dummyCount);
+        // Execute dummy actions with randomized intervals
+        for (var i = 0; i < dummyCount; i++)
+        {
+            Debug.Log(i); 
+            anim.CrossFade(stateName, 0.1f);
+            FlutterMessage.SendMessage(i.ToString(), "dummyRepsCount");
+            yield return new WaitForSeconds(repTime+0.5f);
+            anim.CrossFade("Idle Pose", 0.3f);
+
+            yield return new WaitForSeconds(Math.Max(intervals[i]- (repTime + 0.5f), 0f) );
+        }
+
+        dummyStarted = false;
+    }
+
+    private IEnumerator TransitionAfterDuration(Animator anim, float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        anim.CrossFade("Idle Pose", 0.2f);
+        avatarStarted = false;
+    }
+
+
+    // private void UpdateAvatar(RepState repState)
+    // {
+    //     if (called) return;
+    //     var avatar = GameObject.Find("avatar");
+    //     // var trainerInteraction  = InteractiveCharacterController.Instance.currentInteraction;
+    //         
+    //     var animator = avatar.GetComponent<Animator>();
+    //     // var duration = trainerInteraction.TotalDuration;
+    //     // repState.
+    //     IEnumerator TransitionAfterDuration(Animator anim, float dur)
+    //     {
+    //         yield return new WaitForSeconds(dur);
+    //         anim.CrossFade("Idle Pose", 1f);
+    //     }
+    //
+    //     animator.CrossFade(repState.stateName, 0);
+    //     StartCoroutine(TransitionAfterDuration(animator, repState.totalDuration));    
+    //
+    //     called = true;
+    // }
+
+    private void StartIdle(GameObject obj)
+    {
+        var animator = obj.GetComponent<Animator>();
+        int randomInt = Random.Range(4, 7);
+        animator.CrossFade("idle" + randomInt, 0);
+    }
+
+    private void Awake()
+    {
     }
 }
