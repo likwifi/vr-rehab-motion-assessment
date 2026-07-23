@@ -33,4 +33,37 @@ public class PlanarReflection : MonoBehaviour
         /*ReflectionCamera.transform.position = new Vector3(activeCam.transform.position.x,
             activeCam.transform.position.y - distance, activeCam.transform.position.z);*/
     }
+
+    private void LateUpdate()
+    {
+        /*
+        ReflectionCamera.transform.position = new Vector3(activeCam.transform.position.x, -activeCam.transform.position.y + transform.position.y, activeCam.transform.position.z);
+        ReflectionCamera.transform.rotation = Quaternion.Euler(-activeCam.transform.eulerAngles.x, -activeCam.transform.eulerAngles.y, 0f);
+        */
+        StartCoroutine(updateFrame());
+    }
+
+    private IEnumerator updateFrame()
+    {
+        yield return new WaitUntil(() => ReflectionCamera != null);
+        ReflectionCamera.transform.position = new Vector3(activeCam.transform.position.x,
+            activeCam.transform.position.y - distance, activeCam.transform.position.z);
+        ReflectionCamera.transform.rotation =
+            Quaternion.Euler(-activeCam.transform.eulerAngles.x + rotationDelta, activeCam.transform.eulerAngles.y, 0f);
+
+        Resolution = new Vector2(Camera.main.pixelWidth, Camera.main.pixelHeight);
+
+        ReflectionRenderTexture.Release();
+        // ReflectionRenderTexture.width = Mathf.RoundToInt(Resolution.x);
+        // ReflectionRenderTexture.height = Mathf.RoundToInt(Resolution.y);
+        
+        // ReflectionRenderTexture.Release();
+        ReflectionRenderTexture.width =
+            Mathf.RoundToInt(Resolution.x) * ReflectionResloution / Mathf.RoundToInt(Resolution.y);
+        ReflectionRenderTexture.height = ReflectionResloution;
+        
+
+            // Mathf.RoundToInt(Resolution.x) * ReflectionResloution / Mathf.RoundToInt(Resolution.y);
+        // ReflectionRenderTexture.height = Camera.main.pixelHeight/*ReflectionResloution*/;
+    }
 }
