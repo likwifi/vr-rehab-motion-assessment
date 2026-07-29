@@ -40,5 +40,15 @@ public class LightProbeRuntime : MonoBehaviour
                     SHAddPointLight(probePositions[i], l.transform.position, l.range, l.color, l.intensity, ref bakedProbes[i]);
             }
         }
+        LightmapSettings.lightProbes.bakedProbes = bakedProbes;
+    }
+
+    void SHAddPointLight(Vector3 probePosition, Vector3 position, float range, Color color, float intensity, ref SphericalHarmonicsL2 sh)
+    {
+        // From the point of view of an SH probe, point light looks no different than a directional light,
+        // just attenuated and coming from the right direction.
+        Vector3 probeToLight = position - probePosition;
+        float attenuation = 1.0F / (1.0F + 25.0F * probeToLight.sqrMagnitude / (range * range));
+        sh.AddDirectionalLight(probeToLight.normalized, color, intensity * attenuation);
     }
 }
