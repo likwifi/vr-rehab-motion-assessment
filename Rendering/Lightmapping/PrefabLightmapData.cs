@@ -127,5 +127,56 @@ public class PrefabLightmapData : MonoBehaviour
                 break;
             }
         }
+
+        LightmapSettings.lightmapsMode = (m_LightmapsDir.Length == m_Lightmaps.Length && directional) ? LightmapsMode.CombinedDirectional : LightmapsMode.NonDirectional;
+        ApplyRendererInfo(m_RendererInfo, offsetsindexes, m_LightInfo);
+        LightmapSettings.lightmaps = combinedLightmaps2;
+    }
+
+    void OnEnable()
+    {
+
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+    }
+
+    // called second
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Init();
+    }
+
+    // called when the game is terminated
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+
+
+    void ApplyRendererInfo(RendererInfo[] infos, int[] lightmapOffsetIndex, LightInfo[] lightsInfo)
+    {
+        for (int i = 0; i < infos.Length; i++)
+        {
+            var info = infos[i];
+
+            info.renderer.lightmapIndex = lightmapOffsetIndex[info.lightmapIndex];
+            info.renderer.lightmapScaleOffset = info.lightmapOffsetScale;
+
+            if (releaseShaders)
+            {
+                // You have to release shaders.
+                Material[] mat = info.renderer.sharedMaterials;
+                for (int j = 0; j < mat.Length; j++)
+                {
+                    if (mat[j] != null && Shader.Find(mat[j].shader.name) != null)
+                    {
+                        mat[j].shader = Shader.Find(mat[j].shader.name);
+                    }
+                    
+                }
+            }
+
+        }
     }
 }
