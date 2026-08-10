@@ -76,5 +76,66 @@ public class StopMotion : MonoBehaviour
                 record.Add(STransform.FromTransform(t));
             }
         }
+        else
+        {
+            for (int i = 0; i < transforms.Count; i++)
+            {
+                record[i] = STransform.FromTransform(transforms[i]);
+            }
+        }
+
+        Debug.Assert(transforms.Count == record.Count);
+    }
+
+    void RestoreRecord(List<STransform> record)
+    {
+        Debug.Assert(record != null);
+        Debug.Assert(record.Count == transforms.Count);
+
+        for (int i = 0; i < transforms.Count; i++)
+        {
+            record[i].WriteTo(transforms[i]);
+        }
+    }
+
+
+    void Reset()
+    {
+        var smr = GetComponentInChildren<SkinnedMeshRenderer>();
+
+        if (smr != null)
+        {
+            RootBone = smr.rootBone;
+        }
+        else
+        {
+            RootBone = null;
+        }
+
+        StoppedFrameCount = 5;
+    }
+
+    struct STransform
+    {
+        public Vector3 LocalPosition;
+        public Quaternion LocalRotation;
+        public Vector3 LocalScale;
+
+        public static STransform FromTransform(Transform t)
+        {
+            return new STransform
+            {
+                LocalPosition = t.localPosition,
+                LocalRotation = t.localRotation,
+                LocalScale = t.localScale
+            };
+        }
+
+        public void WriteTo(Transform t)
+        {
+            t.localPosition = LocalPosition;
+            t.localRotation = LocalRotation;
+            t.localScale = LocalScale;
+        }
     }
 }
