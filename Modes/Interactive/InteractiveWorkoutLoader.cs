@@ -38,7 +38,7 @@ public class InteractiveWorkoutLoader : MonoBehaviour
     {
         yield return new WaitForSeconds(8);
         character.StopListening();
-        yield return character.speak(localeBundle["jamieHelperPrompt"], null,
+        yield return character.speak(localeBundle["trainerHelperPrompt"], null,
             (object text) => { character.StartListening(VoiceCallback); });
     }
 

@@ -104,7 +104,7 @@ namespace Mediapipe.Unity.Tutorial
                 }
             }
 
-            complianceTime = DateTime.Now.Millisecond;
+            complianceTime = Environment.TickCount; // milliseconds since system start
             return true;
         }
     }

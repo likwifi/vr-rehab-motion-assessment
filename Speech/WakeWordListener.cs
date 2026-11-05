@@ -6,7 +6,7 @@
 // using UnityEngine;
 // using utils;
 //
-// public class HeyJamie : MonoBehaviour
+// public class WakeWordListener : MonoBehaviour
 // {
 //
 //     public GameObject character;

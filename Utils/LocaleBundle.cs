@@ -27,8 +27,8 @@ namespace utils
             {"kick", "kick"},
             {"gettingReady", "Excellent, getting your workout ready!"},
             {"workoutFound", "Awesome, loading {0} workout for you, meanwhile stand back and get ready."},
-            {"workoutTypeQuestion", "Hey {0}, Jamie is here. What type of workout would you like to have today?"},
-            {"jamieHelperPrompt", "I can load High intensity, martial, yoga, strength, and kids workouts, which one would you like?"}
+            {"workoutTypeQuestion", "Hey {0}, your trainer is here. What type of workout would you like to have today?"},
+            {"trainerHelperPrompt", "I can load High intensity, martial, yoga, strength, and kids workouts, which one would you like?"}
         };
         static Dictionary<string, string> zh = new()
         {

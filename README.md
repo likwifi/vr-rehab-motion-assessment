@@ -125,6 +125,11 @@ Not included:
 - The exercise-specific constraint sets and the spoken-correction inventory described in the journal manuscript.
 - Participant recordings, annotations or any other study data.
 
+## Versions
+
+`v1.0.0` is the snapshot that accompanies the journal manuscript submission. Later
+releases contain maintenance changes listed in `CHANGELOG.md`.
+
 ## Configuration and security
 
 Service endpoints and download locations are collected in `Utils/ServiceConfig.cs` as placeholders. Set them to your own services before running the scripts. Do not commit participant data, recordings, credentials, access tokens or private endpoints.

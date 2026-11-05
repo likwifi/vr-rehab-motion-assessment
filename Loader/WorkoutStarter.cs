@@ -35,7 +35,7 @@ public class WorkoutStarter : MonoBehaviour
 #endif
     }
 
-    public void LoadJamieAssistant()
+    public void LoadTrainerAssistant()
     {
         SceneManager.LoadScene(1, LoadSceneMode.Single);
         FlutterMessage.SendMessage("Assistant_loaded");
