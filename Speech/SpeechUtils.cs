@@ -11,7 +11,7 @@ public static class SpeechUtils
         [CanBeNull] Action<object> callbackOnPlay,
         [CanBeNull] Action<object> callbackOnFinishPlay)
     {
-        var url = "http://185.127.66.13:8889/synth-audio?text=" + UnityWebRequest.EscapeURL(text);
+        var url = ServiceConfig.SynthAudioUrl + "?text=" + UnityWebRequest.EscapeURL(text);
         using var www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV);
         yield return www.SendWebRequest();
 

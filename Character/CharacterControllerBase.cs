@@ -111,9 +111,7 @@ public class CharacterControllerBase : MonoBehaviour
                    ",\"style\": \"" + style + "\", \"locale\": \"" + localeCode + "\",\"store\":\""+store+"\"}";
         
         Debug.Log(text);
-        // https://jamies.fit/api/requestSpeech
-        // http://localhost:3000/requestSpeech
-        var ttsRequest = UnityWebRequest.PostWwwForm("https://api2-wpjhixwfcq-uc.a.run.app/speech/requestSpeech", "");
+        var ttsRequest = UnityWebRequest.PostWwwForm(ServiceConfig.SpeechServiceBaseUrl + "/speech/requestSpeech", "");
         ttsRequest.SetRequestHeader("Content-Type", "application/json");
         ttsRequest.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(@body));
         yield return ttsRequest.SendWebRequest();

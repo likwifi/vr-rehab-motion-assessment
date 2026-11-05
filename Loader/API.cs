@@ -48,7 +48,7 @@ public class API : MonoBehaviour
     public IEnumerator LoadStreamingAudioFile(string fileName, string type, AudioSource audioSource,
         Action<object> callbackOnPlay, Action<object> callbackOnFinish)
     {
-        using var www = UnityWebRequestMultimedia.GetAudioClip("https://api2-wpjhixwfcq-uc.a.run.app/speech/requestMusicByType?fileName="+fileName+"&type="+type, AudioType.MPEG);
+        using var www = UnityWebRequestMultimedia.GetAudioClip(ServiceConfig.SpeechServiceBaseUrl + "/speech/requestMusicByType?fileName="+fileName+"&type="+type, AudioType.MPEG);
         yield return www.SendWebRequest();
 
         if (www.result == UnityWebRequest.Result.ConnectionError)

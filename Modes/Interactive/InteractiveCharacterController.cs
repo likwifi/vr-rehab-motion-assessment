@@ -340,7 +340,7 @@ namespace InteractiveModeScripts
             }
             else
             {
-                // StartCoroutine(requestWorkoutJSON("https://firebasestorage.googleapis.com/v0/b/optical-net-91011.appspot.com/o/classes%2FHana%2Fjson%2Flesson1.json?alt=media&token=e39ff666-03eb-4cea-b3a8-7975f9b4cef1"));
+                // StartCoroutine(requestWorkoutJSON(ServiceConfig.InteractiveLessonJsonUrl));
             }
         }
 
