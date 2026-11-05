@@ -2,13 +2,13 @@
 
 Unity C# research code for a virtual-reality rehabilitation application. The code supports pose-based exercise assessment, repetition counting, interactive workout activities, avatar control, and communication with a Flutter host application.
 
-This repository contains the application scripts used for research and paper reproducibility. It is a code-only extract rather than a complete, directly runnable Unity project.
+This repository contains Unity application scripts from the research system described in an IEEE EDUCON 2024 conference paper and in an extended journal manuscript (VIRTA). It is a partial, code-only extract rather than a complete, directly runnable Unity project; see [Scope of this extract](#scope-of-this-extract).
 
 ## Main capabilities
 
 - Pose landmark processing and pose similarity analysis
 - Exercise repetition detection and counting
-- Dynamic Time Warping (DTW) experiments for action matching
+- A Dynamic Time Warping (DTW) nearest-template matching demonstration
 - Interactive and performance workout modes
 - Workout JSON loading and state management
 - Unity-to-Flutter messaging
@@ -38,7 +38,26 @@ This repository contains the application scripts used for research and paper rep
   </tr>
 </table>
 
-Figures are reproduced from the accompanying [IEEE EDUCON 2024 paper](https://ieeexplore.ieee.org/document/10578849).
+The figures above are reproduced from the accompanying [IEEE EDUCON 2024 paper](https://ieeexplore.ieee.org/document/10578849).
+
+## System overview
+
+<table>
+  <tr>
+    <td width="58%" align="center" valign="top">
+      <img src="docs/images/virta-system-architecture.png" width="420" alt="System architecture: workout list, database, workout scene, virtual trainer, and the camera-to-speech measurement path">
+      <br>
+      <sub><strong>System architecture</strong><br>The presentation path plays the recorded instructor motion on the virtual trainer; the measurement path turns the camera stream into spoken guidance.</sub>
+    </td>
+    <td width="42%" align="center" valign="top">
+      <img src="docs/images/virta-measurement-pipeline.png" width="300" alt="Measurement chain: frontal camera, pose estimation, action recognition, repetition detection, guidance generator, text to speech, speaker">
+      <br>
+      <sub><strong>Measurement chain</strong><br>Camera, pose estimation, action recognition, repetition detection, guidance generation and speech output.</sub>
+    </td>
+  </tr>
+</table>
+
+These two figures are from the VIRTA journal manuscript (under review).
 
 ## Repository structure
 
@@ -60,7 +79,7 @@ Figures are reproduced from the accompanying [IEEE EDUCON 2024 paper](https://ie
 ├── UI/                     # Button and touch input handling
 ├── Utils/                  # Shared data models and Flutter messaging utilities
 ├── ThirdParty/
-│   └── DynamicBone/        # Third-party secondary-motion asset (see Licence note)
+│   └── DynamicBone/        # Third-party secondary-motion asset (see License)
 └── docs/                   # Paper figures and authoring notes
 ```
 
@@ -80,7 +99,7 @@ The scripts reference the following Unity packages or integrations:
 - Unity Recorder
 - Flutter Unity Integration
 
-The exact Unity and package versions used for the paper should be recorded here before publication.
+Unity and package versions are not pinned in this extract.
 
 ## Using the code
 
@@ -92,27 +111,31 @@ The exact Unity and package versions used for the paper should be recorded here 
 
 Because project assets and configuration are not included, additional wiring is required before the code will run.
 
-## Research reproducibility
+## Scope of this extract
 
-For a reproducible paper release, consider adding:
+Included:
 
-- The paper title, authors, and publication link
-- The tested Unity and package versions
-- Hardware and VR headset specifications
-- Dataset or exercise-template preparation steps
-- Experiment configuration and evaluation protocol
-- An anonymized example workout and expected output
-- A tagged release matching the submitted or published paper
+- Unity-side scripts for pose landmark processing (MediaPipe BlazePose, GPU inference), repetition detection, keyframe-based pose compliance checks, workout modes, avatar control, AssetBundle loading and Unity-to-Flutter messaging.
+- `PoseEstimation/DTW.cs`, a self-contained demonstration of DTW nearest-template matching on synthetic sequences. It shows the algorithm; it is not a trained or evaluated classifier.
 
-## Security and privacy
+Not included:
 
-Some scripts currently contain hard-coded service endpoints and Firebase download URLs with access tokens. Review, revoke, or replace these values before publishing the repository. Do not commit participant data, recordings, credentials, private endpoints, or other sensitive rehabilitation data.
+- The Flutter host application and the server-side services (speech synthesis and content delivery).
+- Unity scenes, prefabs, animator controllers, avatars, the captured motion library and workout files.
+- The exercise-specific constraint sets and the spoken-correction inventory described in the journal manuscript.
+- Participant recordings, annotations or any other study data.
+
+## Configuration and security
+
+Service endpoints and download locations are collected in `Utils/ServiceConfig.cs` as placeholders. Set them to your own services before running the scripts. Do not commit participant data, recordings, credentials, access tokens or private endpoints.
 
 ## Citation
 
-This code accompanies the following paper:
+This code accompanies the following publications:
 
 > M. Aslanyan, "Development of Intelligent Workout Environment for VR Devices," *2024 IEEE Global Engineering Education Conference (EDUCON)*, 2024. [IEEE Xplore](https://ieeexplore.ieee.org/document/10578849)
+
+> M. Aslanyan, "VIRTA: Development and Preliminary Evaluation of a Full-Body Virtual Trainer for Exercise Guidance," journal manuscript under review.
 
 If you use this code in academic work, please cite:
 
@@ -133,4 +156,4 @@ This research software is provided for experimental and academic use. It is not 
 
 ## License
 
-No license has been selected yet. Add an appropriate license before public distribution and verify that any included third-party code can be redistributed under that license.
+The code in this repository is released under the MIT License (see `LICENSE`), with one exception: `ThirdParty/DynamicBone/` is third-party code that is not covered by that license and remains subject to its author's terms.

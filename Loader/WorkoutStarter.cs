@@ -30,8 +30,7 @@ public class WorkoutStarter : MonoBehaviour
         FlutterMessage.SendMessage("SCENE_INITIALIZED");
 
 #if UNITY_EDITOR
-        var nameUnityURL =
-            "https://firebasestorage.googleapis.com/v0/b/optical-net-91011.appspot.com/o/bundles%2Fclasses%2Fhiit%2FJamie%2Fjamie-IOS?alt=media&token=add60b0b-cbca-4353-abd3-e9e5429f492b";
+        var nameUnityURL = ServiceConfig.EditorTestBundleUrl;
         api.GetBundleObject(nameUnityURL, OnContentLoaded, loadedScene.transform);
 #endif
     }
@@ -162,7 +161,7 @@ public class WorkoutStarter : MonoBehaviour
             poseEstimatorObj.transform.parent = GameObject.Find("LoadedScene").transform;
             var character = GameObject.Find("Character").GetComponent<InteractiveCharacterController>();
 
-            character.setWorkoutJson("https://firebasestorage.googleapis.com/v0/b/optical-net-91011.appspot.com/o/jsons%2Fhiit%2FJamie%2FnegOuRLOfQ.json?alt=media&token=a5672739-209d-459d-b04a-095114f687d5");
+            character.setWorkoutJson(ServiceConfig.EditorTestWorkoutJsonUrl);
 #else
             StartCoroutine(WaitForWorkout());
 #endif
