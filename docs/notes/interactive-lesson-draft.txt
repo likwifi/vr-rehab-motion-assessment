@@ -20,7 +20,7 @@
 // InteractionSaveManger.Save(workout);
 
 
-// Jamie
+// Trainer lesson
 var warmup0 = new InteractionObject("greet", 1, "", 3.5f, true);
 var greet0 = new InteractionObject("", 0,
 "Hello fellows! What an amazing day! Lets begin our workout with quick warmup.");
